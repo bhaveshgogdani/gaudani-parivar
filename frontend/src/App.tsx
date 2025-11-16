@@ -3,9 +3,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { LanguageProvider } from './context/LanguageContext';
 import HomePage from './pages/HomePage';
 import UploadResultPage from './pages/UploadResultPage';
-import ViewResultsPage from './pages/ViewResultsPage';
-import TopThreeRankingPage from './pages/TopThreeRankingPage';
-import EventInformationPage from './pages/EventInformationPage';
 import AdminLoginPage from './pages/AdminLoginPage';
 import AdminDashboard from './pages/AdminDashboard';
 import ManageVillages from './pages/ManageVillages';
@@ -25,9 +22,6 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/upload-result" element={<UploadResultPage />} />
-          <Route path="/view-results" element={<ViewResultsPage />} />
-          <Route path="/top-three-ranking" element={<TopThreeRankingPage />} />
-          <Route path="/event-information" element={<EventInformationPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route
             path="/admin"

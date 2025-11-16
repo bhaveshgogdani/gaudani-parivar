@@ -22,14 +22,14 @@
   "navigation": {
     "home": "Gaudani Parivar",
     "addResult": "Add New Result",
-    "addVillage": "Add Village Name",
+    "addVillage": "Add Village",
     "studentList": "Student List",
     "topThree": "Top 3 List",
     "eventInfo": "Event Information",
     "logout": "Logout",
-    "adminDashboard": "Admin Dashboard",
+    "adminDashboard": "Dashboard",
     "manageVillages": "Manage Villages",
-    "manageStandards": "Manage Standards",
+    "manageStandards": "Standards",
     "viewReports": "View Reports"
   },
   "forms": {

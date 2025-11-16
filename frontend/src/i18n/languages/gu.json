@@ -22,14 +22,14 @@
   "navigation": {
     "home": "ગૌદાની પરિવાર",
     "addResult": "નવું રિજલ્ટ ઉમેરો",
-    "addVillage": "ગામ નું નામ ઉમેરો",
+    "addVillage": "ગામ ઉમેરો",
     "studentList": "વિધાર્થી નું લીસ્ટ",
     "topThree": "એક થી ત્રણ નંબર નું લીસ્ટ",
     "eventInfo": "કાર્ય ક્રમની માહિતી",
     "logout": "Logout",
-    "adminDashboard": "એડમિન ડેશબોર્ડ",
+    "adminDashboard": "ડેશબોર્ડ",
     "manageVillages": "ગામોનું સંચાલન",
-    "manageStandards": "ધોરણોનું સંચાલન",
+    "manageStandards": "ધોરણો",
     "viewReports": "રિપોર્ટ જુઓ"
   },
   "forms": {

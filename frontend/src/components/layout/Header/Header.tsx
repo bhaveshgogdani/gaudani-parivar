@@ -22,30 +22,32 @@ const Header: React.FC = () => {
           <Link to="/">{t('navigation.home')}</Link>
         </div>
         <nav className={styles.nav}>
-          <Link to="/">{t('navigation.home')}</Link>
-          <Link to="/upload-result">{t('navigation.addResult')}</Link>
-          {isAdmin && (
-            <Link to="/admin/manage-villages">{t('navigation.addVillage')}</Link>
+          {!isAdmin && (
+            <>
+              <Link to="/">{t('navigation.home')}</Link>
+              <Link to="/upload-result">{t('navigation.addResult')}</Link>
+              <div className={styles.kuldevi}>
+                || કુળદેવી આઈ શ્રી ખોડીયાર માતાજી ||
+              </div>
+            </>
           )}
-          <Link to="/view-results">{t('navigation.studentList')}</Link>
-          <Link to="/top-three-ranking">{t('navigation.topThree')}</Link>
-          <Link to="/event-information">{t('navigation.eventInfo')}</Link>
           {isAdmin && (
             <>
               <Link to="/admin">{t('navigation.adminDashboard')}</Link>
+              <Link to="/admin/manage-villages">{t('navigation.addVillage')}</Link>
+              <Link to="/admin/manage-standards">{t('navigation.manageStandards')}</Link>
+              <Link to="/admin/view-reports">{t('navigation.viewReports')}</Link>
+              <div className={styles.kuldevi}>
+                || કુળદેવી આઈ શ્રી ખોડીયાર માતાજી ||
+              </div>
               <Button variant="danger" size="small" onClick={handleLogout}>
                 {t('navigation.logout')}
               </Button>
             </>
           )}
+           
         </nav>
         <div className={styles.rightSection}>
-          <div className={styles.greeting}>
-            Hello {isAdmin ? 'Admin' : 'User'}...!
-          </div>
-          <div className={styles.kuldevi}>
-            || કુળદેવી આઈ શ્રી ખોડીયાર માતાજી ||
-          </div>
           <LanguageSwitcher />
         </div>
       </div>
