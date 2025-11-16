@@ -8,7 +8,8 @@
     "dev": "nodemon server.js",
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "add-villages": "node scripts/addVillages.js"
+    "add-villages": "node scripts/addVillages.js",
+    "add-standards": "node scripts/addStandards.js"
   },
   "keywords": ["gaudani", "result", "upload"],
   "author": "",

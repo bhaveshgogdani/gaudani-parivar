@@ -17,14 +17,29 @@ import Button from '../../components/common/Button/Button';
 import styles from './UploadResultPage.module.css';
 
 const resultSchema = z.object({
-  studentName: z.string().min(2, 'Minimum 2 characters required').max(100),
-  standardId: z.string().min(1, 'Standard is required'),
-  medium: z.enum(['gujarati', 'english']),
-  totalMarks: z.number().min(1).max(10000),
-  obtainedMarks: z.number().min(0),
+  studentName: z.string().min(1, 'Student name is required').min(2, 'Minimum 2 characters required').max(100),
+  standardId: z.string().refine((val) => val && val.length > 0 && val !== '', {
+    message: 'Standard is required',
+  }),
+  medium: z.enum(['gujarati', 'english'], {
+    errorMap: () => ({ message: 'Medium is required' }),
+  }),
+  totalMarks: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
+    z.number({ required_error: 'Total marks is required', invalid_type_error: 'Total marks must be a number' })
+      .min(1, 'Total marks must be at least 1')
+      .max(10000)
+  ),
+  obtainedMarks: z.preprocess(
+    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
+    z.number({ required_error: 'Obtained marks is required', invalid_type_error: 'Obtained marks must be a number' })
+      .min(0, 'Obtained marks cannot be negative')
+  ),
   percentage: z.number().min(0).max(100),
-  villageId: z.string().min(1, 'Village is required'),
-  contactNumber: z.string().regex(/^[0-9]{10}$/, 'Contact number must be exactly 10 digits'),
+  villageId: z.string().refine((val) => val && val.length > 0 && val !== '', {
+    message: 'Village is required',
+  }),
+  contactNumber: z.string().min(1, 'Contact number is required').regex(/^[0-9]{10}$/, 'Contact number must be exactly 10 digits'),
 }).refine(
   (data) => {
     return data.obtainedMarks <= data.totalMarks;
@@ -55,6 +70,9 @@ const UploadResultPage: React.FC = () => {
     reset,
   } = useForm<ResultFormData>({
     resolver: zodResolver(resultSchema),
+    mode: 'onSubmit', // Only validate on submit
+    reValidateMode: 'onChange', // Re-validate on change after first error
+    shouldFocusError: true, // Focus first error field
     defaultValues: {
       medium: 'gujarati', // Default medium is Gujarati
     },
@@ -70,14 +88,14 @@ const UploadResultPage: React.FC = () => {
 
   useEffect(() => {
     // Always calculate percentage from marks
-    if (totalMarks && obtainedMarks !== undefined && totalMarks > 0) {
+    if (totalMarks && obtainedMarks !== undefined && totalMarks > 0 && !isNaN(totalMarks) && !isNaN(obtainedMarks)) {
       const calc = (obtainedMarks / totalMarks) * 100;
       const calculatedValue = parseFloat(calc.toFixed(2));
       setCalculatedPercentage(calculatedValue);
-      setValue('percentage', calculatedValue, { shouldValidate: true });
+      setValue('percentage', calculatedValue, { shouldValidate: false });
     } else {
       setCalculatedPercentage(null);
-      setValue('percentage', 0);
+      setValue('percentage', 0, { shouldValidate: false });
     }
   }, [totalMarks, obtainedMarks, setValue]);
 
@@ -190,17 +208,23 @@ const UploadResultPage: React.FC = () => {
 
           <div className={styles.marksSection}>
             <Input
-              label={t('forms.totalMarks')}
+              label={<>{t('forms.totalMarks')} <span className={styles.requiredAsterisk}>*</span></>}
               type="number"
               step="1"
-              {...register('totalMarks', { valueAsNumber: true })}
+              {...register('totalMarks', { 
+                valueAsNumber: true,
+                required: 'Total marks is required',
+              })}
               error={errors.totalMarks?.message}
             />
             <Input
-              label={t('forms.obtainedMarks')}
+              label={<>{t('forms.obtainedMarks')} <span className={styles.requiredAsterisk}>*</span></>}
               type="number"
               step="0.01"
-              {...register('obtainedMarks', { valueAsNumber: true })}
+              {...register('obtainedMarks', { 
+                valueAsNumber: true,
+                required: 'Obtained marks is required',
+              })}
               error={errors.obtainedMarks?.message}
             />
           </div>
