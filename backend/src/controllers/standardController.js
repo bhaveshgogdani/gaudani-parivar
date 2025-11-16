@@ -2,11 +2,11 @@ import Standard from '../models/Standard.js';
 
 export const getStandards = async (req, res, next) => {
   try {
-    const { includeInactive } = req.query;
     const query = {};
 
-    // If not admin or includeInactive not set, only return active standards
-    if (!includeInactive || includeInactive !== 'true') {
+    // If user is authenticated (admin accessing /all route), return all standards including inactive
+    // Otherwise (public route), return only active standards
+    if (!req.user) {
       query.isActive = true;
     }
 

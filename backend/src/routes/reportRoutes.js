@@ -15,10 +15,8 @@ import { authMiddleware } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Public routes
-router.get('/top-three', getTopThree);
-
-// Admin only routes
+// All report routes are admin only
+router.get('/top-three', authMiddleware, getTopThree);
 router.get('/summary', authMiddleware, getSummary);
 router.get('/by-medium', authMiddleware, getByMedium);
 router.get('/by-village', authMiddleware, getByVillage);

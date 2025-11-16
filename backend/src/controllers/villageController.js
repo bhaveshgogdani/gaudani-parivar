@@ -2,11 +2,11 @@ import Village from '../models/Village.js';
 
 export const getVillages = async (req, res, next) => {
   try {
-    const { includeInactive } = req.query;
     const query = {};
 
-    // If not admin or includeInactive not set, only return active villages
-    if (!includeInactive || includeInactive !== 'true') {
+    // If user is authenticated (admin accessing /all route), return all villages including inactive
+    // Otherwise (public route), return only active villages
+    if (!req.user) {
       query.isActive = true;
     }
 

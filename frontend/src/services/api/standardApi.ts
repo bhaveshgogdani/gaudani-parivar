@@ -3,9 +3,9 @@ import { Standard } from '../../types/result.types';
 
 export const standardApi = {
   getAll: async (includeInactive = false): Promise<Standard[]> => {
-    const response = await api.get<{ status: string; data: Standard[] }>('/standards', {
-      params: { includeInactive },
-    });
+    // Use /all endpoint for admin (includes inactive), regular endpoint for public (active only)
+    const endpoint = includeInactive ? '/standards/all' : '/standards';
+    const response = await api.get<{ status: string; data: Standard[] }>(endpoint);
     return response.data.data;
   },
 

@@ -3,9 +3,9 @@ import { Village } from '../../types/result.types';
 
 export const villageApi = {
   getAll: async (includeInactive = false): Promise<Village[]> => {
-    const response = await api.get<{ status: string; data: Village[] }>('/villages', {
-      params: { includeInactive },
-    });
+    // Use /all endpoint for admin (includes inactive), regular endpoint for public (active only)
+    const endpoint = includeInactive ? '/villages/all' : '/villages';
+    const response = await api.get<{ status: string; data: Village[] }>(endpoint);
     return response.data.data;
   },
 
