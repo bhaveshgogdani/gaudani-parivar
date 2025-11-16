@@ -69,7 +69,7 @@ const TopThreeRankingPage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <Layout showHeader={false}>
       <div className={styles.topThreePage}>
         <h1 className={styles.title}>{t('pages.topThree.title')}</h1>
 

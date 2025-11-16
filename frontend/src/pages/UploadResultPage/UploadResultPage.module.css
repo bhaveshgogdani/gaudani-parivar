@@ -1,22 +1,69 @@
 .uploadPage {
   max-width: 800px;
   margin: 0 auto;
+  padding: 2rem 1rem;
+  position: relative;
+}
+
+.headerRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1rem;
+  flex-wrap: nowrap;
+  width: 100%;
+}
+
+.homeButton {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.homeIcon {
+  display: none;
+  font-size: 1.2rem;
+}
+
+.homeText {
+  display: inline;
+}
+
+.titleSection {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-width: 0;
 }
 
 .title {
   font-size: 2rem;
   color: #333;
-  margin-bottom: 0.5rem;
-  text-align: center;
+  margin: 0;
+  margin-bottom: 0.25rem;
   font-family: 'Noto Sans Gujarati', sans-serif;
+  white-space: nowrap;
 }
 
 .subtitle {
   font-size: 1.125rem;
   color: #666;
-  margin-bottom: 2rem;
-  text-align: center;
+  margin: 0;
   font-family: 'Noto Sans Gujarati', sans-serif;
+  white-space: nowrap;
+}
+
+.languageSwitcher {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .form {
@@ -40,6 +87,13 @@
   font-weight: 500;
   color: #333;
   font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+/* Make asterisks red */
+.requiredAsterisk {
+  color: #f44336;
+  font-weight: bold;
+  margin-left: 2px;
 }
 
 .radioOptions {
@@ -82,6 +136,52 @@
 }
 
 @media (max-width: 768px) {
+  .uploadPage {
+    padding: 1rem;
+  }
+
+  .headerRow {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .homeButton {
+    padding: 0.5rem;
+    min-width: auto;
+  }
+
+  .homeIcon {
+    display: inline;
+  }
+
+  .homeText {
+    display: none;
+  }
+
+  .titleSection {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .title {
+    font-size: 1.5rem;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .subtitle {
+    font-size: 0.875rem;
+    white-space: normal;
+    word-break: break-word;
+  }
+
+  .languageSwitcher {
+    flex-shrink: 0;
+  }
+
   .marksSection {
     grid-template-columns: 1fr;
   }

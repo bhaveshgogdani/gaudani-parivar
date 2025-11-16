@@ -1,8 +1,8 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useTranslation } from '../../i18n/useTranslation';
-import LanguageSwitcher from '../../components/common/LanguageSwitcher/LanguageSwitcher';
-import Button from '../../components/common/Button/Button';
+import { useTranslation } from '../../../i18n/useTranslation';
+import LanguageSwitcher from '../../common/LanguageSwitcher/LanguageSwitcher';
+import Button from '../../common/Button/Button';
 import styles from './Header.module.css';
 
 const Header: React.FC = () => {

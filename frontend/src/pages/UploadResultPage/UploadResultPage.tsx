@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/useTranslation';
 import { resultApi } from '../../services/api/resultApi';
 import { villageApi } from '../../services/api/villageApi';
 import { standardApi } from '../../services/api/standardApi';
 import { Village, Standard, CreateResultData } from '../../types/result.types';
 import Layout from '../../components/layout/Layout';
+import LanguageSwitcher from '../../components/common/LanguageSwitcher/LanguageSwitcher';
 import Input from '../../components/common/Input/Input';
 import Select from '../../components/common/Select/Select';
 import FileUpload from '../../components/common/FileUpload/FileUpload';
@@ -18,18 +20,14 @@ const resultSchema = z.object({
   studentName: z.string().min(2, 'Minimum 2 characters required').max(100),
   standardId: z.string().min(1, 'Standard is required'),
   medium: z.enum(['gujarati', 'english']),
-  totalMarks: z.number().min(1).max(10000).optional(),
-  obtainedMarks: z.number().min(0).optional(),
+  totalMarks: z.number().min(1).max(10000),
+  obtainedMarks: z.number().min(0),
   percentage: z.number().min(0).max(100),
   villageId: z.string().min(1, 'Village is required'),
-  contactNumber: z.string().regex(/^[0-9]{10}$/).optional().or(z.literal('')),
+  contactNumber: z.string().regex(/^[0-9]{10}$/, 'Contact number must be exactly 10 digits'),
 }).refine(
   (data) => {
-    // Either marks or percentage must be provided
-    if (data.totalMarks && data.obtainedMarks) {
-      return data.obtainedMarks <= data.totalMarks;
-    }
-    return true;
+    return data.obtainedMarks <= data.totalMarks;
   },
   {
     message: 'Obtained marks cannot exceed total marks',
@@ -41,6 +39,7 @@ type ResultFormData = z.infer<typeof resultSchema>;
 
 const UploadResultPage: React.FC = () => {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [villages, setVillages] = useState<Village[]>([]);
   const [standards, setStandards] = useState<Standard[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -56,6 +55,9 @@ const UploadResultPage: React.FC = () => {
     reset,
   } = useForm<ResultFormData>({
     resolver: zodResolver(resultSchema),
+    defaultValues: {
+      medium: 'gujarati', // Default medium is Gujarati
+    },
   });
 
   const totalMarks = watch('totalMarks');
@@ -67,10 +69,15 @@ const UploadResultPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    if (totalMarks && obtainedMarks) {
+    // Always calculate percentage from marks
+    if (totalMarks && obtainedMarks !== undefined && totalMarks > 0) {
       const calc = (obtainedMarks / totalMarks) * 100;
-      setCalculatedPercentage(calc);
-      setValue('percentage', parseFloat(calc.toFixed(2)));
+      const calculatedValue = parseFloat(calc.toFixed(2));
+      setCalculatedPercentage(calculatedValue);
+      setValue('percentage', calculatedValue, { shouldValidate: true });
+    } else {
+      setCalculatedPercentage(null);
+      setValue('percentage', 0);
     }
   }, [totalMarks, obtainedMarks, setValue]);
 
@@ -88,11 +95,17 @@ const UploadResultPage: React.FC = () => {
   };
 
   const onSubmit = async (data: ResultFormData) => {
+    if (!resultImage) {
+      alert(t('validation.resultImageRequired'));
+      setIsLoading(false);
+      return;
+    }
+    
     setIsLoading(true);
     try {
       const resultData: CreateResultData = {
         ...data,
-        resultImage: resultImage || undefined,
+        resultImage: resultImage,
       };
       await resultApi.create(resultData);
       alert(t('messages.success.resultAdded'));
@@ -113,20 +126,37 @@ const UploadResultPage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <Layout showHeader={false}>
       <div className={styles.uploadPage}>
-        <h1 className={styles.title}>{t('pages.upload.title')}</h1>
-        <p className={styles.subtitle}>{t('pages.upload.subtitle')}</p>
+        <div className={styles.headerRow}>
+          <Button
+            variant="secondary"
+            size="small"
+            onClick={() => navigate('/')}
+            className={styles.homeButton}
+            title={t('navigation.home')}
+          >
+            <span className={styles.homeIcon}>🏠</span>
+            <span className={styles.homeText}>{t('navigation.home')}</span>
+          </Button>
+          <div className={styles.titleSection}>
+            <h1 className={styles.title}>{t('pages.upload.title')}</h1>
+            <p className={styles.subtitle}>{t('pages.upload.subtitle')}</p>
+          </div>
+          <div className={styles.languageSwitcher}>
+            <LanguageSwitcher />
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
           <Input
-            label={t('forms.studentName')}
+            label={<>{t('forms.studentName')} <span className={styles.requiredAsterisk}>*</span></>}
             {...register('studentName')}
             error={errors.studentName?.message}
           />
 
           <div className={styles.radioGroup}>
-            <label>{t('forms.medium')}</label>
+            <label>{t('forms.medium')} <span className={styles.requiredAsterisk}>*</span></label>
             <div className={styles.radioOptions}>
               <label>
                 <input
@@ -149,7 +179,7 @@ const UploadResultPage: React.FC = () => {
           </div>
 
           <Select
-            label={t('forms.standard')}
+            label={<>{t('forms.standard')} <span className={styles.requiredAsterisk}>*</span></>}
             options={standards.map((s) => ({
               value: s._id,
               label: s.standardName,
@@ -181,16 +211,17 @@ const UploadResultPage: React.FC = () => {
             step="0.01"
             {...register('percentage', { valueAsNumber: true })}
             error={errors.percentage?.message}
-            readOnly={calculatedPercentage !== null}
+            readOnly={true}
+            disabled={true}
           />
           {calculatedPercentage !== null && (
             <p className={styles.calculatedNote}>
-              Calculated: {calculatedPercentage.toFixed(2)}%
+              {t('pages.home.calculated')}: {calculatedPercentage.toFixed(2)}%
             </p>
           )}
 
           <Select
-            label={t('forms.village')}
+            label={<>{t('forms.village')} <span className={styles.requiredAsterisk}>*</span></>}
             options={villages.map((v) => ({
               value: v._id,
               label: v.villageName,
@@ -200,7 +231,7 @@ const UploadResultPage: React.FC = () => {
           />
 
           <Input
-            label={t('forms.contactNumber')}
+            label={<>{t('forms.contactNumber')} <span className={styles.requiredAsterisk}>*</span></>}
             type="tel"
             maxLength={10}
             {...register('contactNumber')}
@@ -208,9 +239,10 @@ const UploadResultPage: React.FC = () => {
           />
 
           <FileUpload
-            label={t('forms.resultImage')}
+            label={<>{t('forms.resultImage')} <span className={styles.requiredAsterisk}>*</span></>}
             onChange={setResultImage}
             value={resultImage}
+            error={!resultImage ? t('validation.resultImageRequired') : undefined}
           />
 
           <div className={styles.actions}>

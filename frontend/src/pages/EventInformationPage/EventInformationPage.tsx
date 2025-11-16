@@ -7,7 +7,7 @@ const EventInformationPage: React.FC = () => {
   const { t } = useTranslation();
 
   return (
-    <Layout>
+    <Layout showHeader={false}>
       <div className={styles.eventPage}>
         <h1 className={styles.title}>{t('navigation.eventInfo')}</h1>
         

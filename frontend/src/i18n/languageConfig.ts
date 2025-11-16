@@ -8,11 +8,13 @@ export const defaultLanguage = 'gu';
 export const getLanguageFromStorage = (): string => {
   if (typeof window !== 'undefined') {
     const stored = localStorage.getItem('language');
-    return stored && supportedLanguages.find((lang) => lang.code === stored)
-      ? stored
-      : defaultLanguage;
+    // If no language is stored or stored language is invalid, return default (Gujarati)
+    if (!stored || !supportedLanguages.find((lang) => lang.code === stored)) {
+      return defaultLanguage; // Gujarati is the default
+    }
+    return stored;
   }
-  return defaultLanguage;
+  return defaultLanguage; // Gujarati is the default
 };
 
 export const saveLanguageToStorage = (code: string): void => {

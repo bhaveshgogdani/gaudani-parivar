@@ -127,7 +127,7 @@ const ViewResultsPage: React.FC = () => {
   };
 
   return (
-    <Layout>
+    <Layout showHeader={false}>
       <div className={styles.resultsPage}>
         <h1 className={styles.title}>{t('pages.results.title')}</h1>
 

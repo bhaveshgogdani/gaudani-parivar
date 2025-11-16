@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import styles from './FileUpload.module.css';
 
 interface FileUploadProps {
-  label?: string;
+  label?: string | React.ReactNode;
   accept?: string;
   maxSize?: number; // in bytes
   onChange: (file: File | null) => void;

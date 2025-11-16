@@ -14,19 +14,30 @@ export const createResult = async (req, res, next) => {
       contactNumber,
     } = req.body;
 
+    // Validate required fields
+    if (!contactNumber || !contactNumber.match(/^[0-9]{10}$/)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Contact number is required and must be exactly 10 digits',
+      });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Result image is required',
+      });
+    }
+
     // Calculate percentage if marks are provided
     let calculatedPercentage = percentage;
     if (totalMarks && obtainedMarks) {
       calculatedPercentage = (obtainedMarks / totalMarks) * 100;
     }
 
-    // Handle file upload
-    let resultImageUrl;
-    let resultImageFileName;
-    if (req.file) {
-      resultImageUrl = `/uploads/results/${req.file.filename}`;
-      resultImageFileName = req.file.originalname;
-    }
+    // Handle file upload (required)
+    const resultImageUrl = `/uploads/results/${req.file.filename}`;
+    const resultImageFileName = req.file.originalname;
 
     const result = new Result({
       studentName,

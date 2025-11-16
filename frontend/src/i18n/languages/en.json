@@ -83,8 +83,11 @@
       "title": "Gaudani Parivar | Jay Khodiyar Ma",
       "welcome": "Welcome",
       "instructions": "Click the button below to upload your result",
+      "instructionsTitle": "Instructions for Uploading Result",
+      "instructionsParagraph": "To upload a result, please follow these steps: First, enter the student's full name (required), then select the medium (Gujarati or English) (required), choose the student's standard (required), select the village family (required), enter total marks and obtained marks (percentage will be calculated automatically), enter contact number (required - 10 digits), and finally upload the result image (required). After filling all the required information, click on the 'Upload Result' button.",
       "uploadResult": "Upload Result",
-      "viewResults": "View Results"
+      "viewResults": "View Results",
+      "calculated": "Calculated"
     },
     "upload": {
       "title": "Add New Result",
@@ -132,7 +135,9 @@
     "mustBeNumber": "Must be a number",
     "mustBePositive": "Must be a positive number",
     "percentageRange": "Percentage must be between 0 and 100",
-    "marksExceedTotal": "Obtained marks cannot exceed total marks"
+    "marksExceedTotal": "Obtained marks cannot exceed total marks",
+    "resultImageRequired": "Result image is required",
+    "contactNumberRequired": "Contact number is required"
   },
   "tables": {
     "srNo": "Sr. No.",

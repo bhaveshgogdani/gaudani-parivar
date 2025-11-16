@@ -5,14 +5,16 @@ import styles from './Layout.module.css';
 
 interface LayoutProps {
   children: ReactNode;
+  showHeader?: boolean;
+  showFooter?: boolean;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children }) => {
+const Layout: React.FC<LayoutProps> = ({ children, showHeader = true, showFooter = true }) => {
   return (
     <div className={styles.layout}>
-      <Header />
+      {showHeader && <Header />}
       <main className={styles.main}>{children}</main>
-      <Footer />
+      {showFooter && <Footer />}
     </div>
   );
 };

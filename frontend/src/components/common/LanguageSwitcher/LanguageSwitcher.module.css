@@ -12,6 +12,15 @@
   background-color: white;
   cursor: pointer;
   transition: border-color 0.3s ease;
+  min-width: 100px;
+}
+
+@media (max-width: 768px) {
+  .select {
+    padding: 0.4rem 0.3rem;
+    font-size: 0.75rem;
+    min-width: 60px;
+  }
 }
 
 .select:focus {

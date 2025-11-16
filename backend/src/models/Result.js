@@ -41,14 +41,17 @@ const ResultSchema = new mongoose.Schema(
     },
     contactNumber: {
       type: String,
+      required: true,
       trim: true,
       match: /^[0-9]{10}$/,
     },
     resultImageUrl: {
       type: String,
+      required: true,
     },
     resultImageFileName: {
       type: String,
+      required: true,
     },
     submittedAt: {
       type: Date,

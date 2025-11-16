@@ -20,11 +20,16 @@ const translationsMap: Record<string, Translations> = {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [language, setLanguageState] = useState<string>(getLanguageFromStorage());
+  // Initialize with Gujarati as default language
+  const [language, setLanguageState] = useState<string>(() => {
+    const stored = getLanguageFromStorage();
+    // Ensure Gujarati is the default if no valid language is stored
+    return stored || defaultLanguage;
+  });
 
   useEffect(() => {
+    // Save language preference and update HTML lang attribute
     saveLanguageToStorage(language);
-    // Update HTML lang attribute
     document.documentElement.lang = language;
   }, [language]);
 
