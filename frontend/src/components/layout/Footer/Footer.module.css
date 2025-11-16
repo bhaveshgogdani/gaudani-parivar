@@ -1,0 +1,30 @@
+.footer {
+  background-color: #333;
+  color: white;
+  padding: 2rem 1rem;
+  margin-top: auto;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.content {
+  text-align: center;
+}
+
+.kuldevi {
+  font-size: 1.125rem;
+  color: #4caf50;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  font-weight: 500;
+  margin-bottom: 1rem;
+}
+
+.copyright {
+  font-size: 0.875rem;
+  color: #ccc;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+

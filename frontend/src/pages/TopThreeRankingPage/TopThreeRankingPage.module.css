@@ -1,0 +1,110 @@
+.topThreePage {
+  padding: 2rem 1rem;
+}
+
+.title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.controls {
+  max-width: 600px;
+  margin: 0 auto 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.results {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.group {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.groupTitle {
+  font-size: 1.5rem;
+  color: #4caf50;
+  margin-bottom: 1rem;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.table th,
+.table td {
+  padding: 1rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+.table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+.topTableContainer {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.topTableTitle {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.sectionTitle {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1.5rem;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  text-align: center;
+}
+
+.emptyCell {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.printActions {
+  display: flex;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+@media (max-width: 768px) {
+  .actions {
+    flex-direction: column;
+  }
+}
+

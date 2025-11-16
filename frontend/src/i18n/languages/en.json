@@ -1,0 +1,143 @@
+{
+  "common": {
+    "save": "Save",
+    "reset": "Reset",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "search": "Search",
+    "submit": "Submit",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "yes": "Yes",
+    "no": "No",
+    "close": "Close",
+    "print": "Print",
+    "download": "Download",
+    "export": "Export",
+    "view": "View",
+    "actions": "Actions"
+  },
+  "navigation": {
+    "home": "Gaudani Parivar",
+    "addResult": "Add New Result",
+    "addVillage": "Add Village Name",
+    "studentList": "Student List",
+    "topThree": "Top 3 List",
+    "eventInfo": "Event Information",
+    "logout": "Logout",
+    "adminDashboard": "Admin Dashboard",
+    "manageVillages": "Manage Villages",
+    "manageStandards": "Manage Standards",
+    "viewReports": "View Reports"
+  },
+  "forms": {
+    "studentName": "Student Full Name",
+    "standard": "Student Standard",
+    "medium": "Medium",
+    "gujarati": "Gujarati",
+    "english": "English",
+    "totalMarks": "Total Marks",
+    "obtainedMarks": "Obtained Marks",
+    "percentage": "Total Percentage",
+    "village": "Village Family",
+    "contactNumber": "Contact Number",
+    "resultImage": "Result Image",
+    "email": "Email",
+    "password": "Password",
+    "villageName": "Village/Family Name",
+    "standardName": "Standard/Degree Name",
+    "standardCode": "Code",
+    "displayOrder": "Order",
+    "isCollegeLevel": "College Level",
+    "isActive": "Active Status"
+  },
+  "messages": {
+    "success": {
+      "resultAdded": "Result added successfully",
+      "villageAdded": "Village added successfully",
+      "standardAdded": "Standard added successfully",
+      "resultUpdated": "Result updated successfully",
+      "villageUpdated": "Village updated successfully",
+      "standardUpdated": "Standard updated successfully",
+      "resultDeleted": "Result deleted successfully",
+      "villageDeleted": "Village deleted successfully",
+      "standardDeleted": "Standard deleted successfully",
+      "loginSuccess": "Login successful"
+    },
+    "error": {
+      "required": "This field is required",
+      "invalidEmail": "Invalid email",
+      "invalidPhone": "Invalid phone number",
+      "invalidFile": "Invalid file type",
+      "fileTooLarge": "File is too large",
+      "loginFailed": "Login failed",
+      "unauthorized": "Unauthorized access",
+      "serverError": "Server error",
+      "networkError": "Network error"
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "Gaudani Parivar | Jay Khodiyar Ma",
+      "welcome": "Welcome",
+      "instructions": "Click the button below to upload your result",
+      "uploadResult": "Upload Result",
+      "viewResults": "View Results"
+    },
+    "upload": {
+      "title": "Add New Result",
+      "subtitle": "Please fill in your result information"
+    },
+    "results": {
+      "title": "Student List",
+      "noResults": "No results found",
+      "filterByStandard": "Student Standard",
+      "filterByVillage": "Village Family",
+      "filterByMedium": "Medium",
+      "all": "All",
+      "printCollege": "Print College",
+      "srNo": "Sr. No.",
+      "studentName": "Student Full Name",
+      "standard": "Student Standard",
+      "percentage": "Percentage",
+      "village": "Village Family",
+      "contact": "Contact Number"
+    },
+    "topThree": {
+      "title": "Top 3 List",
+      "selectStandard": "Select Standard",
+      "clickHere": "Click Here",
+      "viewAll": "View All",
+      "downloadDocx": "Download All first 3 Rank Docx"
+    },
+    "admin": {
+      "login": {
+        "title": "Admin Login",
+        "subtitle": "Please enter your login credentials"
+      },
+      "dashboard": {
+        "title": "Admin Dashboard",
+        "totalResults": "Total Results",
+        "totalVillages": "Total Villages",
+        "totalStandards": "Total Standards"
+      }
+    }
+  },
+  "validation": {
+    "minLength": "Minimum {min} characters required",
+    "maxLength": "Maximum {max} characters",
+    "invalidFormat": "Invalid format",
+    "mustBeNumber": "Must be a number",
+    "mustBePositive": "Must be a positive number",
+    "percentageRange": "Percentage must be between 0 and 100",
+    "marksExceedTotal": "Obtained marks cannot exceed total marks"
+  },
+  "tables": {
+    "srNo": "Sr. No.",
+    "actions": "Actions",
+    "noData": "No data available"
+  }
+}
+

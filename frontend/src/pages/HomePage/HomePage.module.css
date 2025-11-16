@@ -1,0 +1,47 @@
+.homePage {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  color: #4caf50;
+  margin-bottom: 1rem;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.welcome {
+  font-size: 1.5rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.instructions {
+  font-size: 1.125rem;
+  color: #666;
+  margin-bottom: 2rem;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+
+  .welcome {
+    font-size: 1.25rem;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+}
+

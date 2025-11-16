@@ -1,0 +1,143 @@
+{
+  "common": {
+    "save": "સાચવો",
+    "reset": "રીસેટ",
+    "cancel": "રદ કરો",
+    "delete": "કાઢી નાખો",
+    "edit": "સુધારો કરો",
+    "search": "શોધો",
+    "submit": "સબમિટ કરો",
+    "loading": "લોડ થઈ રહ્યું છે...",
+    "error": "ભૂલ",
+    "success": "સફળતા",
+    "yes": "હા",
+    "no": "ના",
+    "close": "બંધ કરો",
+    "print": "પ્રિન્ટ",
+    "download": "ડાઉનલોડ",
+    "export": "એક્સપોર્ટ",
+    "view": "જુઓ",
+    "actions": "ક્રિયાઓ"
+  },
+  "navigation": {
+    "home": "ગૌદાની પરિવાર",
+    "addResult": "નવું રિજલ્ટ ઉમેરો",
+    "addVillage": "ગામ નું નામ ઉમેરો",
+    "studentList": "વિધાર્થી નું લીસ્ટ",
+    "topThree": "એક થી ત્રણ નંબર નું લીસ્ટ",
+    "eventInfo": "કાર્ય ક્રમની માહિતી",
+    "logout": "Logout",
+    "adminDashboard": "એડમિન ડેશબોર્ડ",
+    "manageVillages": "ગામોનું સંચાલન",
+    "manageStandards": "ધોરણોનું સંચાલન",
+    "viewReports": "રિપોર્ટ જુઓ"
+  },
+  "forms": {
+    "studentName": "વિધાર્થી નું પૂરું નામ",
+    "standard": "વિધાર્થી નું ધોરણ",
+    "medium": "માધ્યમ",
+    "gujarati": "ગુજરાતી",
+    "english": "ઇંગ્લિશ",
+    "totalMarks": "કુલ ગુણ",
+    "obtainedMarks": "મેળવેલ ગુણ",
+    "percentage": "કુલ આવેલ ટકાવારી",
+    "village": "ગામ પરિવાર",
+    "contactNumber": "કોન્ટેક નંબર",
+    "resultImage": "રિજલ્ટ ની છબી",
+    "email": "ઇમેઇલ",
+    "password": "પાસવર્ડ",
+    "villageName": "ગામ/પરિવાર નું નામ",
+    "standardName": "ધોરણ/ડિગ્રી નું નામ",
+    "standardCode": "કોડ",
+    "displayOrder": "ક્રમ",
+    "isCollegeLevel": "કોલેજ સ્તર",
+    "isActive": "સક્રિય સ્થિતિ"
+  },
+  "messages": {
+    "success": {
+      "resultAdded": "રિજલ્ટ સફળતાપૂર્વક ઉમેરાયું",
+      "villageAdded": "ગામ સફળતાપૂર્વક ઉમેરાયું",
+      "standardAdded": "ધોરણ સફળતાપૂર્વક ઉમેરાયું",
+      "resultUpdated": "રિજલ્ટ સફળતાપૂર્વક અપડેટ થયું",
+      "villageUpdated": "ગામ સફળતાપૂર્વક અપડેટ થયું",
+      "standardUpdated": "ધોરણ સફળતાપૂર્વક અપડેટ થયું",
+      "resultDeleted": "રિજલ્ટ સફળતાપૂર્વક કાઢી નાખ્યું",
+      "villageDeleted": "ગામ સફળતાપૂર્વક કાઢી નાખ્યું",
+      "standardDeleted": "ધોરણ સફળતાપૂર્વક કાઢી નાખ્યું",
+      "loginSuccess": "લૉગિન સફળ"
+    },
+    "error": {
+      "required": "આ ફીલ્ડ આવશ્યક છે",
+      "invalidEmail": "અમાન્ય ઇમેઇલ",
+      "invalidPhone": "અમાન્ય ફોન નંબર",
+      "invalidFile": "અમાન્ય ફાઇલ પ્રકાર",
+      "fileTooLarge": "ફાઇલ ખૂબ મોટી છે",
+      "loginFailed": "લૉગિન નિષ્ફળ",
+      "unauthorized": "અનધિકૃત પ્રવેશ",
+      "serverError": "સર્વર ભૂલ",
+      "networkError": "નેટવર્ક ભૂલ"
+    }
+  },
+  "pages": {
+    "home": {
+      "title": "ગૌદાની પરિવાર | જય ખોડીયાર માં",
+      "welcome": "સ્વાગત છે",
+      "instructions": "રિજલ્ટ અપલોડ કરવા માટે નીચેનું બટન ક્લિક કરો",
+      "uploadResult": "રિજલ્ટ અપલોડ કરો",
+      "viewResults": "રિજલ્ટ જુઓ"
+    },
+    "upload": {
+      "title": "નવું રિજલ્ટ ઉમેરો",
+      "subtitle": "કૃપા કરીને તમારા રિજલ્ટની માહિતી ભરો"
+    },
+    "results": {
+      "title": "વિધાર્થી નું લીસ્ટ",
+      "noResults": "કોઈ પરિણામ મળ્યું નથી",
+      "filterByStandard": "વિધાર્થી નું ધોરણ",
+      "filterByVillage": "ગામ પરિવાર",
+      "filterByMedium": "માધ્યમ",
+      "all": "બધા",
+      "printCollege": "Print Colleage",
+      "srNo": "ક્રમ",
+      "studentName": "વિધાર્થી નું પૂરું નામ",
+      "standard": "વિધાર્થી નું ધોરણ",
+      "percentage": "ટકાવારી",
+      "village": "ગામ પરિવાર",
+      "contact": "કોન્ટેક નંબર"
+    },
+    "topThree": {
+      "title": "એક થી ત્રણ નંબર નું લીસ્ટ",
+      "selectStandard": "ધોરણ પસંદ કરો",
+      "clickHere": "અહી ક્લીક કરો",
+      "viewAll": "View All",
+      "downloadDocx": "Download All first 3 Rank Docx"
+    },
+    "admin": {
+      "login": {
+        "title": "એડમિન લૉગિન",
+        "subtitle": "કૃપા કરીને તમારી લૉગિન માહિતી દાખલ કરો"
+      },
+      "dashboard": {
+        "title": "એડમિન ડેશબોર્ડ",
+        "totalResults": "કુલ રિજલ્ટ",
+        "totalVillages": "કુલ ગામો",
+        "totalStandards": "કુલ ધોરણો"
+      }
+    }
+  },
+  "validation": {
+    "minLength": "ઓછામાં ઓછું {min} અક્ષરો જરૂરી છે",
+    "maxLength": "વધુમાં વધુ {max} અક્ષરો",
+    "invalidFormat": "અમાન્ય ફોર્મેટ",
+    "mustBeNumber": "સંખ્યા હોવી જોઈએ",
+    "mustBePositive": "ધન સંખ્યા હોવી જોઈએ",
+    "percentageRange": "ટકાવારી 0 અને 100 વચ્ચે હોવી જોઈએ",
+    "marksExceedTotal": "મેળવેલ ગુણ કુલ ગુણ કરતાં વધુ ન હોઈ શકે"
+  },
+  "tables": {
+    "srNo": "ક્રમ",
+    "actions": "ક્રિયાઓ",
+    "noData": "કોઈ ડેટા મળ્યો નથી"
+  }
+}
+

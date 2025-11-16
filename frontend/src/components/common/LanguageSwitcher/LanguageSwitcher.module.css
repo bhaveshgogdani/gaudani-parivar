@@ -1,0 +1,21 @@
+.languageSwitcher {
+  display: flex;
+  align-items: center;
+}
+
+.select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  background-color: white;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+

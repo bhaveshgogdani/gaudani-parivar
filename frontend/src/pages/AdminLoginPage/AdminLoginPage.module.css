@@ -1,0 +1,47 @@
+.loginPage {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 3rem 1rem;
+}
+
+.title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: #666;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.error {
+  color: #f44336;
+  font-size: 0.875rem;
+  padding: 0.75rem;
+  background: #ffebee;
+  border-radius: 4px;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+

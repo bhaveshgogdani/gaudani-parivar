@@ -1,0 +1,84 @@
+.header {
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.logo a {
+  text-decoration: none;
+  color: #4caf50;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav a:hover {
+  color: #4caf50;
+}
+
+.rightSection {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.25rem;
+}
+
+.greeting {
+  font-size: 0.875rem;
+  color: #666;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.kuldevi {
+  font-size: 0.75rem;
+  color: #4caf50;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  .container {
+    flex-direction: column;
+  }
+
+  .nav {
+    justify-content: center;
+  }
+
+  .rightSection {
+    align-items: center;
+  }
+}
+
