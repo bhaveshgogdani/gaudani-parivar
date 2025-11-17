@@ -8,6 +8,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import ManageVillages from './pages/ManageVillages';
 import ManageStandards from './pages/ManageStandards';
 import ViewReports from './pages/ViewReports';
+import ManageResults from './pages/ManageResults';
 import './App.css';
 
 const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -52,6 +53,14 @@ function App() {
             element={
               <PrivateRoute>
                 <ViewReports />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/manage-results"
+            element={
+              <PrivateRoute>
+                <ManageResults />
               </PrivateRoute>
             }
           />

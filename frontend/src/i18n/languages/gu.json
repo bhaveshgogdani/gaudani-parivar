@@ -22,7 +22,7 @@
   "navigation": {
     "home": "ગૌદાની પરિવાર",
     "addResult": "નવું રિજલ્ટ ઉમેરો",
-    "addVillage": "ગામ ઉમેરો",
+    "addVillage": "ગામ",
     "studentList": "વિધાર્થી નું લીસ્ટ",
     "topThree": "એક થી ત્રણ નંબર નું લીસ્ટ",
     "eventInfo": "કાર્ય ક્રમની માહિતી",
@@ -30,7 +30,8 @@
     "adminDashboard": "ડેશબોર્ડ",
     "manageVillages": "ગામોનું સંચાલન",
     "manageStandards": "ધોરણો",
-    "viewReports": "રિપોર્ટ જુઓ"
+    "manageResults": "રિજલ્ટ",
+    "viewReports": "રિપોર્ટ"
   },
   "forms": {
     "studentName": "વિધાર્થી નું પૂરું નામ",
