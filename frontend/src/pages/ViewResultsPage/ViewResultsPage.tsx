@@ -231,9 +231,8 @@ const ViewResultsPage: React.FC = () => {
                             variant="success"
                             size="small"
                             onClick={() => {
-                              const baseUrl = import.meta.env.VITE_API_BASE_URL;
-                              const serverUrl = baseUrl.replace('/api', '');
-                              setSelectedImage(`${serverUrl}${result.resultImageUrl}`);
+                              // Use relative URL so it goes through Vite proxy in development
+                              setSelectedImage(result.resultImageUrl || '');
                             }}
                             style={{ marginRight: '0.5rem' }}
                           >

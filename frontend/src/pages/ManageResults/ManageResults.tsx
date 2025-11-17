@@ -232,11 +232,9 @@ const ManageResults: React.FC = () => {
 
   const getImageUrl = (result: Result) => {
     if (result.resultImageUrl) {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      // Remove /api from base URL since uploads are served directly
-      const serverUrl = baseUrl.replace('/api', '');
+      // Use relative URL so it goes through Vite proxy in development
       // resultImageUrl is already in format /uploads/results/filename.jpg
-      return `${serverUrl}${result.resultImageUrl}`;
+      return result.resultImageUrl;
     }
     return '';
   };
