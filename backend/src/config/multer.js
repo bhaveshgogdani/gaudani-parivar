@@ -22,9 +22,11 @@ if (!process.env.ALLOWED_FILE_TYPES) {
 }
 
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE, 10);
-// Upload directory is now at project root level (outside backend)
-// From backend/src/config/, go up 3 levels: ../.. -> backend/src, ../.. -> backend, ../.. -> root
-const UPLOAD_DIR = process.env.UPLOAD_DIR;
+// Upload directory is now inside backend folder
+// From backend/src/config/, go up 2 levels: ../.. -> backend/src, .. -> backend
+// Resolve upload directory relative to backend folder
+const backendDir = path.resolve(__dirname, '..', '..');
+const UPLOAD_DIR = path.resolve(backendDir, process.env.UPLOAD_DIR);
 
 // Create upload directory if it doesn't exist
 if (!fs.existsSync(UPLOAD_DIR)) {

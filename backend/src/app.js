@@ -31,13 +31,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Serve uploaded files
-// Upload directory is now at project root level (outside backend)
-// From backend/src/, go up 2 levels: ../ -> backend, ../ -> root
-if (!process.env.UPLOAD_DIR) {
-  throw new Error('UPLOAD_DIR environment variable is required');
-}
-const uploadDir = process.env.UPLOAD_DIR;
-app.use('/uploads', express.static(path.resolve(uploadDir)));
+// Upload directory is now inside backend folder
+// From backend/src/, go up 1 level: .. -> backend
+// Serve from backend/uploads/ (parent directory) so /uploads/results/... URLs work correctly
+const backendDir = path.resolve(__dirname, '..');
+const uploadsBaseDir = path.resolve(backendDir, 'uploads');
+app.use('/uploads', express.static(uploadsBaseDir));
 
 // API routes
 app.use('/api', routes);
