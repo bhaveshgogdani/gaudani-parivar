@@ -1,6 +1,6 @@
 .manageResults {
   padding: 2rem;
-  max-width: 1400px;
+  max-width: 1500px;
   margin: 0 auto;
 }
 
@@ -70,16 +70,18 @@
 }
 
 .resultsTable th {
-  padding: 1rem;
+  padding: 0.35rem 0.75rem;
   text-align: left;
   font-weight: 600;
   color: #333;
   border-bottom: 2px solid #e0e0e0;
+  font-size: 1rem;
 }
 
 .resultsTable td {
-  padding: 1rem;
+  padding: 0.35rem 0.75rem;
   border-bottom: 1px solid #e0e0e0;
+  font-size: 1rem;
 }
 
 .resultsTable tbody tr:hover {
@@ -87,8 +89,8 @@
 }
 
 .resultThumbnail {
-  width: 60px;
-  height: 60px;
+  width: 50px;
+  height: 50px;
   object-fit: cover;
   border-radius: 4px;
   cursor: pointer;
@@ -101,7 +103,7 @@
 
 .actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
   flex-wrap: wrap;
 }
 

@@ -145,7 +145,7 @@ const ViewReports: React.FC = () => {
             onChange={(e) => setFilters({ ...filters, isVerified: e.target.value })}
           />
 
-          <div className={styles.exportActions}>
+          <div style={{ display: 'flex', gap: '1rem' }}>
             <Button variant="success" onClick={() => handleExport('excel')}>
               {t('common.export')} Excel
             </Button>

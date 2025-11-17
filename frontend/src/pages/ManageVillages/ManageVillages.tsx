@@ -13,6 +13,7 @@ const ManageVillages: React.FC = () => {
   const [formData, setFormData] = useState({ villageName: '', isActive: true });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     loadVillages();
@@ -38,8 +39,7 @@ const ManageVillages: React.FC = () => {
         await villageApi.create(formData);
         alert(t('messages.success.villageAdded'));
       }
-      setFormData({ villageName: '', isActive: true });
-      setEditingId(null);
+      handleCloseModal();
       loadVillages();
     } catch (error: any) {
       alert(error.response?.data?.message || t('messages.error.serverError'));
@@ -51,6 +51,19 @@ const ManageVillages: React.FC = () => {
   const handleEdit = (village: Village) => {
     setFormData({ villageName: village.villageName, isActive: village.isActive });
     setEditingId(village._id);
+    setIsModalOpen(true);
+  };
+
+  const handleAddNew = () => {
+    setFormData({ villageName: '', isActive: true });
+    setEditingId(null);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData({ villageName: '', isActive: true });
+    setEditingId(null);
   };
 
   const handleDelete = async (id: string) => {
@@ -68,41 +81,12 @@ const ManageVillages: React.FC = () => {
   return (
     <Layout>
       <div className={styles.manageVillages}>
-        <h1 className={styles.title}>{t('navigation.manageVillages')}</h1>
-
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <Input
-            label={t('forms.villageName')}
-            value={formData.villageName}
-            onChange={(e) => setFormData({ ...formData, villageName: e.target.value })}
-            required
-          />
-
-          <label className={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={formData.isActive}
-              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-            />
-            {t('forms.isActive')}
-          </label>
-
-          <div className={styles.actions}>
-            <Button type="submit" variant="primary" isLoading={isLoading}>
-              {t('common.save')}
-            </Button>
-            <Button
-              type="button"
-              variant="danger"
-              onClick={() => {
-                setFormData({ villageName: '', isActive: true });
-                setEditingId(null);
-              }}
-            >
-              {t('common.reset')}
-            </Button>
-          </div>
-        </form>
+        <div className={styles.headerRow}>
+          <h1 className={styles.title}>{t('navigation.manageVillages')}</h1>
+          <Button variant="primary" onClick={handleAddNew}>
+            Add {t('navigation.manageVillages')}
+          </Button>
+        </div>
 
         <div className={styles.tableContainer}>
           <table className={styles.table}>
@@ -139,6 +123,45 @@ const ManageVillages: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {isModalOpen && (
+          <div className={styles.modalOverlay} onClick={handleCloseModal}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <h2>{editingId ? t('common.edit') : 'Add'} {t('navigation.manageVillages')}</h2>
+                <button className={styles.closeButton} onClick={handleCloseModal}>
+                  ×
+                </button>
+              </div>
+              <form onSubmit={handleSubmit} className={styles.form}>
+                <Input
+                  label={t('forms.villageName')}
+                  value={formData.villageName}
+                  onChange={(e) => setFormData({ ...formData, villageName: e.target.value })}
+                  required
+                />
+
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  />
+                  {t('forms.isActive')}
+                </label>
+
+                <div className={styles.actions}>
+                  <Button type="submit" variant="primary" isLoading={isLoading}>
+                    {t('common.save')}
+                  </Button>
+                  <Button type="button" variant="danger" onClick={handleCloseModal}>
+                    {t('common.cancel')}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );

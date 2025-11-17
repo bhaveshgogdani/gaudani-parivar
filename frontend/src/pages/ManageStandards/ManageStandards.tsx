@@ -19,6 +19,7 @@ const ManageStandards: React.FC = () => {
   });
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     loadStandards();
@@ -44,14 +45,7 @@ const ManageStandards: React.FC = () => {
         await standardApi.create(formData);
         alert(t('messages.success.standardAdded'));
       }
-      setFormData({
-        standardName: '',
-        standardCode: '',
-        displayOrder: 0,
-        isCollegeLevel: false,
-        isActive: true,
-      });
-      setEditingId(null);
+      handleCloseModal();
       loadStandards();
     } catch (error: any) {
       alert(error.response?.data?.message || t('messages.error.serverError'));
@@ -69,6 +63,31 @@ const ManageStandards: React.FC = () => {
       isActive: standard.isActive,
     });
     setEditingId(standard._id);
+    setIsModalOpen(true);
+  };
+
+  const handleAddNew = () => {
+    setFormData({
+      standardName: '',
+      standardCode: '',
+      displayOrder: 0,
+      isCollegeLevel: false,
+      isActive: true,
+    });
+    setEditingId(null);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setFormData({
+      standardName: '',
+      standardCode: '',
+      displayOrder: 0,
+      isCollegeLevel: false,
+      isActive: true,
+    });
+    setEditingId(null);
   };
 
   const handleDelete = async (id: string) => {
@@ -86,71 +105,12 @@ const ManageStandards: React.FC = () => {
   return (
     <Layout>
       <div className={styles.manageStandards}>
-        <h1 className={styles.title}>{t('navigation.manageStandards')}</h1>
-
-        <form onSubmit={handleSubmit} className={styles.form}>
-          <Input
-            label={t('forms.standardName')}
-            value={formData.standardName}
-            onChange={(e) => setFormData({ ...formData, standardName: e.target.value })}
-            required
-          />
-
-          <Input
-            label={t('forms.standardCode')}
-            value={formData.standardCode}
-            onChange={(e) => setFormData({ ...formData, standardCode: e.target.value })}
-            required
-          />
-
-          <Input
-            label={t('forms.displayOrder')}
-            type="number"
-            value={formData.displayOrder}
-            onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
-            required
-          />
-
-          <label className={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={formData.isCollegeLevel}
-              onChange={(e) => setFormData({ ...formData, isCollegeLevel: e.target.checked })}
-            />
-            {t('forms.isCollegeLevel')}
-          </label>
-
-          <label className={styles.checkboxLabel}>
-            <input
-              type="checkbox"
-              checked={formData.isActive}
-              onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-            />
-            {t('forms.isActive')}
-          </label>
-
-          <div className={styles.actions}>
-            <Button type="submit" variant="primary" isLoading={isLoading}>
-              {t('common.save')}
-            </Button>
-            <Button
-              type="button"
-              variant="danger"
-              onClick={() => {
-                setFormData({
-                  standardName: '',
-                  standardCode: '',
-                  displayOrder: 0,
-                  isCollegeLevel: false,
-                  isActive: true,
-                });
-                setEditingId(null);
-              }}
-            >
-              {t('common.reset')}
-            </Button>
-          </div>
-        </form>
+        <div className={styles.headerRow}>
+          <h1 className={styles.title}>{t('navigation.manageStandards')}</h1>
+          <Button variant="primary" onClick={handleAddNew}>
+            Add {t('navigation.manageStandards')}
+          </Button>
+        </div>
 
         <div className={styles.tableContainer}>
           <table className={styles.table}>
@@ -193,6 +153,69 @@ const ManageStandards: React.FC = () => {
             </tbody>
           </table>
         </div>
+
+        {isModalOpen && (
+          <div className={styles.modalOverlay} onClick={handleCloseModal}>
+            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.modalHeader}>
+                <h2>{editingId ? t('common.edit') : 'Add'} {t('navigation.manageStandards')}</h2>
+                <button className={styles.closeButton} onClick={handleCloseModal}>
+                  ×
+                </button>
+              </div>
+              <form onSubmit={handleSubmit} className={styles.form}>
+                <Input
+                  label={t('forms.standardName')}
+                  value={formData.standardName}
+                  onChange={(e) => setFormData({ ...formData, standardName: e.target.value })}
+                  required
+                />
+
+                <Input
+                  label={t('forms.standardCode')}
+                  value={formData.standardCode}
+                  onChange={(e) => setFormData({ ...formData, standardCode: e.target.value })}
+                  required
+                />
+
+                <Input
+                  label={t('forms.displayOrder')}
+                  type="number"
+                  value={formData.displayOrder}
+                  onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
+                  required
+                />
+
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={formData.isCollegeLevel}
+                    onChange={(e) => setFormData({ ...formData, isCollegeLevel: e.target.checked })}
+                  />
+                  {t('forms.isCollegeLevel')}
+                </label>
+
+                <label className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={formData.isActive}
+                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                  />
+                  {t('forms.isActive')}
+                </label>
+
+                <div className={styles.actions}>
+                  <Button type="submit" variant="primary" isLoading={isLoading}>
+                    {t('common.save')}
+                  </Button>
+                  <Button type="button" variant="danger" onClick={handleCloseModal}>
+                    {t('common.cancel')}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
     </Layout>
   );
