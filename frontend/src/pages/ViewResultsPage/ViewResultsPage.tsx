@@ -231,7 +231,7 @@ const ViewResultsPage: React.FC = () => {
                             variant="success"
                             size="small"
                             onClick={() => {
-                              const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+                              const baseUrl = import.meta.env.VITE_API_BASE_URL;
                               const serverUrl = baseUrl.replace('/api', '');
                               setSelectedImage(`${serverUrl}${result.resultImageUrl}`);
                             }}

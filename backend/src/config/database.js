@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gaudani_parivar';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 export const connectDatabase = async () => {
   try {
@@ -24,10 +24,10 @@ const createDefaultAdmin = async () => {
     const adminCount = await Admin.countDocuments();
     
     if (adminCount === 0) {
-      const defaultEmail = process.env.DEFAULT_ADMIN_EMAIL || 'bhavesh@gmail.com';
-      const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD || 'Bhavesh@123_';
-      const defaultUsername = process.env.DEFAULT_ADMIN_USERNAME || 'bhavesh';
-      const defaultFullName = process.env.DEFAULT_ADMIN_FULLNAME || 'Bhavesh';
+      const defaultEmail = process.env.DEFAULT_ADMIN_EMAIL;
+      const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD;
+      const defaultUsername = process.env.DEFAULT_ADMIN_USERNAME;
+      const defaultFullName = process.env.DEFAULT_ADMIN_FULLNAME;
 
       // Create admin with plain password (will be hashed by pre-save hook)
       const defaultAdmin = new Admin({

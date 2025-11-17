@@ -9,7 +9,7 @@ export const authMiddleware = (req, res, next) => {
       return;
     }
 
-    const JWT_SECRET = process.env.JWT_SECRET || 'your_jwt_secret_key_here';
+    const JWT_SECRET = process.env.JWT_SECRET;
     const decoded = jwt.verify(token, JWT_SECRET);
 
     req.user = {

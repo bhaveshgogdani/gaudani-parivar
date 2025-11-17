@@ -7,10 +7,10 @@ import { dirname } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '5242880', 10); // 5MB default
+const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE, 10);
 // Upload directory is now at project root level (outside backend)
 // From backend/src/config/, go up 3 levels: ../.. -> backend/src, ../.. -> backend, ../.. -> root
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '../../../uploads/results');
+const UPLOAD_DIR = process.env.UPLOAD_DIR;
 
 // Create upload directory if it doesn't exist
 if (!fs.existsSync(UPLOAD_DIR)) {
@@ -32,7 +32,7 @@ const storage = multer.diskStorage({
 
 // File filter
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = (process.env.ALLOWED_FILE_TYPES || 'image/jpeg,image/jpg,image/png,application/pdf').split(',');
+  const allowedTypes = process.env.ALLOWED_FILE_TYPES.split(',');
   const allowedMimeTypes = allowedTypes.map(type => type.trim());
   
   if (allowedMimeTypes.includes(file.mimetype)) {

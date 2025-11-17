@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 // Serve uploaded files
 // Upload directory is now at project root level (outside backend)
 // From backend/src/, go up 2 levels: ../ -> backend, ../ -> root
-const uploadDir = process.env.UPLOAD_DIR || path.join(__dirname, '../../uploads/results');
+const uploadDir = process.env.UPLOAD_DIR;
 app.use('/uploads', express.static(path.resolve(uploadDir)));
 
 // API routes
