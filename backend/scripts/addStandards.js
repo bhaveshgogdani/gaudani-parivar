@@ -5,7 +5,7 @@ import Standard from '../src/models/Standard.js';
 // Load environment variables
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gaudani_parivar';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // List of standards to add
 // Format: { standardName, standardCode, displayOrder, isCollegeLevel }

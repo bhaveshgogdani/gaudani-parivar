@@ -4,6 +4,10 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+if (!process.env.MONGODB_URI) {
+  throw new Error('MONGODB_URI environment variable is required');
+}
+
 const MONGODB_URI = process.env.MONGODB_URI;
 
 export const connectDatabase = async () => {
@@ -24,6 +28,11 @@ const createDefaultAdmin = async () => {
     const adminCount = await Admin.countDocuments();
     
     if (adminCount === 0) {
+      if (!process.env.DEFAULT_ADMIN_EMAIL || !process.env.DEFAULT_ADMIN_PASSWORD || 
+          !process.env.DEFAULT_ADMIN_USERNAME || !process.env.DEFAULT_ADMIN_FULLNAME) {
+        throw new Error('Default admin environment variables are required: DEFAULT_ADMIN_EMAIL, DEFAULT_ADMIN_PASSWORD, DEFAULT_ADMIN_USERNAME, DEFAULT_ADMIN_FULLNAME');
+      }
+      
       const defaultEmail = process.env.DEFAULT_ADMIN_EMAIL;
       const defaultPassword = process.env.DEFAULT_ADMIN_PASSWORD;
       const defaultUsername = process.env.DEFAULT_ADMIN_USERNAME;

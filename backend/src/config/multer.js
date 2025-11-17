@@ -3,9 +3,23 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+
+// Validate required environment variables
+if (!process.env.MAX_FILE_SIZE) {
+  throw new Error('MAX_FILE_SIZE environment variable is required');
+}
+if (!process.env.UPLOAD_DIR) {
+  throw new Error('UPLOAD_DIR environment variable is required');
+}
+if (!process.env.ALLOWED_FILE_TYPES) {
+  throw new Error('ALLOWED_FILE_TYPES environment variable is required');
+}
 
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE, 10);
 // Upload directory is now at project root level (outside backend)

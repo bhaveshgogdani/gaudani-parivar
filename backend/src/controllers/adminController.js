@@ -3,6 +3,9 @@ import jwt from 'jsonwebtoken';
 import Result from '../models/Result.js';
 import Village from '../models/Village.js';
 import Standard from '../models/Standard.js';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const login = async (req, res, next) => {
   try {
@@ -32,6 +35,15 @@ export const login = async (req, res, next) => {
     await admin.save();
 
     // Generate JWT token
+    if (!process.env.JWT_SECRET) {
+      res.status(500).json({ message: 'JWT_SECRET environment variable is not configured' });
+      return;
+    }
+    if (!process.env.JWT_EXPIRES_IN) {
+      res.status(500).json({ message: 'JWT_EXPIRES_IN environment variable is not configured' });
+      return;
+    }
+    
     const JWT_SECRET = process.env.JWT_SECRET;
     const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN;
 

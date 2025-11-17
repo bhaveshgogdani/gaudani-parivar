@@ -5,7 +5,7 @@ import Village from '../src/models/Village.js';
 // Load environment variables
 dotenv.config();
 
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/gaudani_parivar';
+const MONGODB_URI = process.env.MONGODB_URI;
 
 // List of villages to add
 const villages = [

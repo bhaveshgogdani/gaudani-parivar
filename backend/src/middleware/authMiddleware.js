@@ -1,4 +1,7 @@
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 export const authMiddleware = (req, res, next) => {
   try {
@@ -9,6 +12,11 @@ export const authMiddleware = (req, res, next) => {
       return;
     }
 
+    if (!process.env.JWT_SECRET) {
+      res.status(500).json({ message: 'JWT_SECRET environment variable is not configured' });
+      return;
+    }
+    
     const JWT_SECRET = process.env.JWT_SECRET;
     const decoded = jwt.verify(token, JWT_SECRET);
 
