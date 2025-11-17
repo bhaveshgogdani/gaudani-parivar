@@ -38,6 +38,7 @@ const resultSchema = z.object({
     message: 'Village is required',
   }),
   contactNumber: z.string().min(1, 'Contact number is required').regex(/^[0-9]{10}$/, 'Contact number must be exactly 10 digits'),
+  isApproved: z.boolean().default(false),
 }).refine(
   (data) => {
     return data.obtainedMarks <= data.totalMarks;
@@ -63,7 +64,6 @@ const ManageResults: React.FC = () => {
   });
   const [selectedResult, setSelectedResult] = useState<Result | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
   const [resultImage, setResultImage] = useState<File | null>(null);
   const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
   const [calculatedPercentage, setCalculatedPercentage] = useState<number | null>(null);
@@ -137,18 +137,8 @@ const ManageResults: React.FC = () => {
     }
   };
 
-  const handleView = (result: Result) => {
-    setSelectedResult(result);
-    setIsEditMode(false);
-    setIsModalOpen(true);
-    setResultImage(null);
-    setFullImageUrl(null);
-    reset();
-  };
-
   const handleEdit = (result: Result) => {
     setSelectedResult(result);
-    setIsEditMode(true);
     setIsModalOpen(true);
     setResultImage(null);
     setFullImageUrl(null);
@@ -165,13 +155,13 @@ const ManageResults: React.FC = () => {
       percentage: result.percentage,
       villageId: villageId,
       contactNumber: result.contactNumber || '',
+      isApproved: result.isApproved || false,
     });
   };
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedResult(null);
-    setIsEditMode(false);
     setResultImage(null);
     setFullImageUrl(null);
     reset();
@@ -301,6 +291,7 @@ const ManageResults: React.FC = () => {
                   <th>{t('pages.results.percentage')}</th>
                   <th>{t('pages.results.village')}</th>
                   <th>{t('pages.results.contact')}</th>
+                  <th>Approved</th>
                   <th>{t('common.view')}</th>
                   <th>{t('common.actions')}</th>
                 </tr>
@@ -308,7 +299,7 @@ const ManageResults: React.FC = () => {
               <tbody>
                 {results.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className={styles.noData}>
+                    <td colSpan={9} className={styles.noData}>
                       {t('pages.results.noResults')}
                     </td>
                   </tr>
@@ -322,6 +313,11 @@ const ManageResults: React.FC = () => {
                       <td>{getVillageName(result)}</td>
                       <td>{result.contactNumber || '-'}</td>
                       <td>
+                        <span className={result.isApproved ? styles.approved : styles.notApproved}>
+                          {result.isApproved ? 'Yes' : 'No'}
+                        </span>
+                      </td>
+                      <td>
                         {result.resultImageUrl && (
                           <img
                             src={getImageUrl(result)}
@@ -333,13 +329,6 @@ const ManageResults: React.FC = () => {
                       </td>
                       <td>
                         <div className={styles.actions}>
-                          <Button
-                            variant="success"
-                            size="small"
-                            onClick={() => handleView(result)}
-                          >
-                            {t('common.view')}
-                          </Button>
                           <Button
                             variant="primary"
                             size="small"
@@ -368,15 +357,14 @@ const ManageResults: React.FC = () => {
           <div className={styles.modalOverlay} onClick={handleCloseModal}>
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
               <div className={styles.modalHeader}>
-                <h2>{isEditMode ? t('common.edit') : t('common.view')}</h2>
+                <h2>{t('common.edit')}</h2>
                 <button className={styles.closeButton} onClick={handleCloseModal}>
                   ×
                 </button>
               </div>
               <div className={styles.modalBody}>
                 <div className={styles.modalLeft}>
-                  {isEditMode ? (
-                    <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+                  <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
                       <Input
                         label={<>{t('forms.studentName')} <span className={styles.required}>*</span></>}
                         {...register('studentName')}
@@ -445,12 +433,10 @@ const ManageResults: React.FC = () => {
                         step="0.01"
                         {...register('percentage', { valueAsNumber: true })}
                         error={errors.percentage?.message}
-                        readOnly={true}
-                        disabled={true}
                       />
-                      {calculatedPercentage !== null && (
+                      {calculatedPercentage !== null && totalMarks && obtainedMarks && (
                         <p className={styles.calculatedNote}>
-                          {t('pages.home.calculated')}: {calculatedPercentage.toFixed(2)}%
+                          {t('pages.home.calculated')}: {calculatedPercentage.toFixed(2)}% (suggestion - you can edit the percentage above)
                         </p>
                       )}
 
@@ -472,6 +458,16 @@ const ManageResults: React.FC = () => {
                         error={errors.contactNumber?.message}
                       />
 
+                      <div className={styles.checkboxGroup}>
+                        <label className={styles.checkboxLabel}>
+                          <input
+                            type="checkbox"
+                            {...register('isApproved')}
+                          />
+                          <span>Approved</span>
+                        </label>
+                      </div>
+
                       <FileUpload
                         label={t('forms.resultImage')}
                         onChange={setResultImage}
@@ -487,54 +483,6 @@ const ManageResults: React.FC = () => {
                         </Button>
                       </div>
                     </form>
-                  ) : (
-                    <div className={styles.viewDetails}>
-                      <div className={styles.detailRow}>
-                        <label>{t('forms.studentName')}:</label>
-                        <span>{selectedResult.studentName}</span>
-                      </div>
-                      <div className={styles.detailRow}>
-                        <label>{t('forms.medium')}:</label>
-                        <span>{selectedResult.medium === 'gujarati' ? t('forms.gujarati') : t('forms.english')}</span>
-                      </div>
-                      <div className={styles.detailRow}>
-                        <label>{t('forms.standard')}:</label>
-                        <span>{getStandardName(selectedResult)}</span>
-                      </div>
-                      <div className={styles.detailRow}>
-                        <label>{t('forms.totalMarks')}:</label>
-                        <span>{selectedResult.totalMarks || '-'}</span>
-                      </div>
-                      <div className={styles.detailRow}>
-                        <label>{t('forms.obtainedMarks')}:</label>
-                        <span>{selectedResult.obtainedMarks || '-'}</span>
-                      </div>
-                      <div className={styles.detailRow}>
-                        <label>{t('forms.percentage')}:</label>
-                        <span>{selectedResult.percentage.toFixed(2)}%</span>
-                      </div>
-                      <div className={styles.detailRow}>
-                        <label>{t('forms.village')}:</label>
-                        <span>{getVillageName(selectedResult)}</span>
-                      </div>
-                      <div className={styles.detailRow}>
-                        <label>{t('forms.contactNumber')}:</label>
-                        <span>{selectedResult.contactNumber || '-'}</span>
-                      </div>
-                      <div className={styles.detailRow}>
-                        <label>Submitted At:</label>
-                        <span>{new Date(selectedResult.submittedAt).toLocaleString()}</span>
-                      </div>
-                      <div className={styles.modalActions}>
-                        <Button variant="primary" onClick={() => handleEdit(selectedResult)}>
-                          {t('common.edit')}
-                        </Button>
-                        <Button variant="danger" onClick={handleCloseModal}>
-                          {t('common.close')}
-                        </Button>
-                      </div>
-                    </div>
-                  )}
                 </div>
                 <div className={styles.modalRight}>
                   {selectedResult.resultImageUrl && (

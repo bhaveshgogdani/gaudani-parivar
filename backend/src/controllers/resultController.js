@@ -29,10 +29,15 @@ export const createResult = async (req, res, next) => {
       });
     }
 
-    // Calculate percentage if marks are provided
-    let calculatedPercentage = percentage;
+    // Calculate percentage from marks (always recalculate in backend)
+    let calculatedPercentage = 0;
     if (totalMarks && obtainedMarks) {
-      calculatedPercentage = (obtainedMarks / totalMarks) * 100;
+      calculatedPercentage = (parseFloat(obtainedMarks) / parseFloat(totalMarks)) * 100;
+      // Round to 2 decimal places
+      calculatedPercentage = Math.round(calculatedPercentage * 100) / 100;
+    } else if (percentage) {
+      // If no marks but percentage provided, use it and round to 2 decimals
+      calculatedPercentage = Math.round(parseFloat(percentage) * 100) / 100;
     }
 
     // Handle file upload (required)
@@ -45,7 +50,7 @@ export const createResult = async (req, res, next) => {
       medium,
       totalMarks: totalMarks ? parseFloat(totalMarks) : undefined,
       obtainedMarks: obtainedMarks ? parseFloat(obtainedMarks) : undefined,
-      percentage: parseFloat(calculatedPercentage),
+      percentage: calculatedPercentage,
       villageId,
       contactNumber,
       resultImageUrl,
@@ -155,9 +160,10 @@ export const updateResult = async (req, res, next) => {
     const { id } = req.params;
     const updateData = req.body;
 
-    // Calculate percentage if marks are provided
-    if (updateData.totalMarks && updateData.obtainedMarks) {
-      updateData.percentage = (updateData.obtainedMarks / updateData.totalMarks) * 100;
+    // When admin edits, use the percentage value they provide directly (no recalculation)
+    // Only round to 2 decimal places to ensure consistency
+    if (updateData.percentage !== undefined) {
+      updateData.percentage = Math.round(parseFloat(updateData.percentage) * 100) / 100;
     }
 
     // Handle file upload
