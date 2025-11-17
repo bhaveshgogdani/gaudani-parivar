@@ -230,7 +230,11 @@ const ViewResultsPage: React.FC = () => {
                           <Button
                             variant="success"
                             size="small"
-                            onClick={() => setSelectedImage(result.resultImageUrl || null)}
+                            onClick={() => {
+                              const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+                              const serverUrl = baseUrl.replace('/api', '');
+                              setSelectedImage(`${serverUrl}${result.resultImageUrl}`);
+                            }}
                             style={{ marginRight: '0.5rem' }}
                           >
                             {t('common.view')}

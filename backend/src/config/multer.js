@@ -8,7 +8,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE || '5242880', 10); // 5MB default
-const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads/results';
+// Upload directory is now at project root level (outside backend)
+// From backend/src/config/, go up 3 levels: ../.. -> backend/src, ../.. -> backend, ../.. -> root
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, '../../../uploads/results');
 
 // Create upload directory if it doesn't exist
 if (!fs.existsSync(UPLOAD_DIR)) {
