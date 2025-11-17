@@ -12,14 +12,14 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
   error?: string;
 }
 
-const Select: React.FC<SelectProps> = ({
+const Select = React.forwardRef<HTMLSelectElement, SelectProps>(({
   label,
   options,
   error,
   className = '',
   id,
   ...props
-}) => {
+}, ref) => {
   const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
 
   return (
@@ -30,6 +30,7 @@ const Select: React.FC<SelectProps> = ({
         </label>
       )}
       <select
+        ref={ref}
         id={selectId}
         className={`${styles.select} ${error ? styles.error : ''} ${className}`}
         {...props}
@@ -44,7 +45,9 @@ const Select: React.FC<SelectProps> = ({
       {error && <span className={styles.errorMessage}>{error}</span>}
     </div>
   );
-};
+});
+
+Select.displayName = 'Select';
 
 export default Select;
 

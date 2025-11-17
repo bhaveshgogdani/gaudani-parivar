@@ -20,8 +20,6 @@ const ViewReports: React.FC = () => {
     medium: '',
     standardId: '',
     villageId: '',
-    dateFrom: '',
-    dateTo: '',
     isVerified: '',
   });
   const [summary, setSummary] = useState<any>(null);
@@ -59,8 +57,6 @@ const ViewReports: React.FC = () => {
         medium: filters.medium || undefined,
         standardId: filters.standardId || undefined,
         villageId: filters.villageId || undefined,
-        dateFrom: filters.dateFrom || undefined,
-        dateTo: filters.dateTo || undefined,
       });
       setSummary(data);
     } catch (error) {
@@ -75,8 +71,6 @@ const ViewReports: React.FC = () => {
       const data = await reportApi.getByMedium({
         standardId: filters.standardId || undefined,
         villageId: filters.villageId || undefined,
-        dateFrom: filters.dateFrom || undefined,
-        dateTo: filters.dateTo || undefined,
       });
       setByMediumData(data);
     } catch (error) {
@@ -138,20 +132,6 @@ const ViewReports: React.FC = () => {
             ]}
             value={filters.villageId}
             onChange={(e) => setFilters({ ...filters, villageId: e.target.value })}
-          />
-
-          <Input
-            label="Date From"
-            type="date"
-            value={filters.dateFrom}
-            onChange={(e) => setFilters({ ...filters, dateFrom: e.target.value })}
-          />
-
-          <Input
-            label="Date To"
-            type="date"
-            value={filters.dateTo}
-            onChange={(e) => setFilters({ ...filters, dateTo: e.target.value })}
           />
 
           <Select
