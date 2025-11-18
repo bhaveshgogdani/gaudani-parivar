@@ -22,10 +22,113 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
+.tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e0e0e0;
+  justify-content: center;
+}
+
+.tab,
+.activeTab {
+  padding: 0.75rem 1.5rem;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  color: #666;
+  transition: all 0.3s;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.activeTab {
+  color: #4caf50;
+  border-bottom-color: #4caf50;
+  font-weight: 600;
+}
+
+.tab:hover {
+  color: #4caf50;
+}
+
 .actions {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #666;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.noData {
+  text-align: center;
+  padding: 3rem;
+  font-size: 1.2rem;
+  color: #666;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.imageModalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 2rem;
+}
+
+.imageModalContent {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeImageButton {
+  position: absolute;
+  top: -2rem;
+  right: -2rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #333;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: background 0.2s;
+}
+
+.closeImageButton:hover {
+  background: white;
+}
+
+.fullSizeImage {
+  max-width: 100%;
+  max-height: 80vh;
+  object-fit: contain;
+  border-radius: 4px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
 }
 
 .results {
@@ -64,6 +167,25 @@
 .table th {
   background-color: #f5f5f5;
   font-weight: 600;
+}
+
+.resultThumbnail {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.resultThumbnail:hover {
+  transform: scale(1.1);
+}
+
+.rowActions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .topTableContainer {

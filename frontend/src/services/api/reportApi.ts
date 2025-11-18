@@ -2,9 +2,9 @@ import api from './api';
 import { Result } from '../../types/result.types';
 
 export const reportApi = {
-  getTopThree: async (standardId?: string): Promise<any> => {
+  getTopThree: async (standardId?: string, medium?: string): Promise<any> => {
     const response = await api.get('/reports/top-three', {
-      params: { standardId },
+      params: { standardId, medium },
     });
     return response.data.data;
   },

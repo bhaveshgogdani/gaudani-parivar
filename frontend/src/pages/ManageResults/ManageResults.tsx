@@ -13,6 +13,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import styles from './ManageResults.module.css';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const resultSchema = z.object({
   studentName: z.string().min(1, 'Student name is required').min(2, 'Minimum 2 characters required').max(100),
@@ -67,6 +68,9 @@ const ManageResults: React.FC = () => {
   const [resultImage, setResultImage] = useState<File | null>(null);
   const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
   const [calculatedPercentage, setCalculatedPercentage] = useState<number | null>(null);
+  const [autoOpenedResultId, setAutoOpenedResultId] = useState<string | null>(null);
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -158,6 +162,26 @@ const ManageResults: React.FC = () => {
       isApproved: result.isApproved || false,
     });
   };
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const resultId = params.get('resultId');
+
+    if (resultId && autoOpenedResultId !== resultId && results.length > 0) {
+      const targetResult = results.find((result) => result._id === resultId);
+      if (targetResult) {
+        handleEdit(targetResult);
+        setAutoOpenedResultId(resultId);
+
+        params.delete('resultId');
+        const newSearch = params.toString();
+        navigate(
+          newSearch ? `${location.pathname}?${newSearch}` : location.pathname,
+          { replace: true }
+        );
+      }
+    }
+  }, [location.search, results, autoOpenedResultId, navigate]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);

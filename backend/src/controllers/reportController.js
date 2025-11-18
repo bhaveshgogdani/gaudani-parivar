@@ -1,4 +1,6 @@
 import Result from '../models/Result.js';
+import Standard from '../models/Standard.js';
+import Village from '../models/Village.js';
 import mongoose from 'mongoose';
 import { Document, Packer, Paragraph, Table, TableRow, TableCell, WidthType } from 'docx';
 import ExcelJS from 'exceljs';
@@ -6,41 +8,125 @@ import PDFDocument from 'pdfkit';
 
 export const getTopThree = async (req, res, next) => {
   try {
-    const { standardId } = req.query;
+    const { standardId, medium } = req.query;
 
-    const matchQuery = {};
+    // First, get all school level standards (isCollegeLevel: false)
+    const schoolStandards = await Standard.find({ isCollegeLevel: false }).select('_id displayOrder');
+    const schoolStandardIds = schoolStandards.map(s => s._id);
+
+    const matchQuery = {
+      standardId: { $in: schoolStandardIds }, // Only school level standards
+      isApproved: true, // Only approved results
+    };
+    
     if (standardId && mongoose.Types.ObjectId.isValid(standardId)) {
       matchQuery.standardId = new mongoose.Types.ObjectId(standardId);
     }
+    
+    if (medium && (medium === 'gujarati' || medium === 'english')) {
+      matchQuery.medium = medium;
+    }
 
-    const topThree = await Result.aggregate([
+    // Group by standardId and medium, then sort by percentage
+    const groupedResults = await Result.aggregate([
       { $match: matchQuery },
       {
-        $sort: { percentage: -1 },
+        $sort: { percentage: -1, submittedAt: 1 }, // Sort by percentage desc, then by submission date
       },
       {
         $group: {
-          _id: '$standardId',
+          _id: {
+            standardId: '$standardId',
+            medium: '$medium',
+          },
           results: { $push: '$$ROOT' },
         },
       },
-      {
-        $project: {
-          _id: 1,
-          topThree: { $slice: ['$results', 3] },
-        },
-      },
     ]);
 
-    const populatedResults = await Result.populate(topThree, [
-      { path: '_id', select: 'standardName standardCode isCollegeLevel' },
-      { path: 'topThree.standardId', select: 'standardName standardCode isCollegeLevel' },
-      { path: 'topThree.villageId', select: 'villageName' },
-    ]);
+    // Process each group to assign ranks (same percentage = same rank) and get top 3 ranks
+    const processedGroups = groupedResults.map((group) => {
+      let previousPercentage = null;
+      let uniqueRankCount = 1;
+      let currentRank = 1;
+      const rankedResults = [];
+
+      for (let i = 0; i < group.results.length; i++) {
+        const result = group.results[i];
+        
+        // If percentage is different from previous, update rank
+        if (previousPercentage !== null && result.percentage !== previousPercentage) {
+          uniqueRankCount += 1;
+          currentRank = uniqueRankCount;
+        }
+        
+        // Only include results with rank 1, 2, or 3
+        if (uniqueRankCount <= 3) {
+          result.rank = currentRank;
+          rankedResults.push(result);
+          previousPercentage = result.percentage;
+        } else {
+          // Stop once we've passed rank 3
+          break;
+        }
+      }
+
+      return {
+        _id: group._id,
+        topThree: rankedResults,
+      };
+    });
+
+    // Manually populate the results since aggregation returns plain objects
+    const populatedResults = await Promise.all(
+      processedGroups.map(async (group) => {
+        // Populate standard
+        const standard = await Standard.findById(group._id.standardId).select('standardName standardCode isCollegeLevel displayOrder');
+        
+        // Populate each result
+        const populatedTopThree = await Promise.all(
+          group.topThree.map(async (result) => {
+            const populatedResult = { ...result };
+            
+            // Populate standardId
+            if (populatedResult.standardId) {
+              const standardId = populatedResult.standardId.toString ? populatedResult.standardId.toString() : populatedResult.standardId;
+              if (mongoose.Types.ObjectId.isValid(standardId)) {
+                populatedResult.standardId = await Standard.findById(standardId).select('standardName standardCode isCollegeLevel displayOrder');
+              }
+            }
+            
+            // Populate villageId
+            if (populatedResult.villageId) {
+              const villageId = populatedResult.villageId.toString ? populatedResult.villageId.toString() : populatedResult.villageId;
+              if (mongoose.Types.ObjectId.isValid(villageId)) {
+                populatedResult.villageId = await Village.findById(villageId).select('villageName');
+              }
+            }
+            
+            return populatedResult;
+          })
+        );
+        
+        return {
+          _id: {
+            standardId: standard,
+            medium: group._id.medium,
+          },
+          topThree: populatedTopThree,
+        };
+      })
+    );
+
+    const sortedResults = populatedResults.sort((a, b) => {
+      const orderA = a._id.standardId?.displayOrder ?? Number.MAX_SAFE_INTEGER;
+      const orderB = b._id.standardId?.displayOrder ?? Number.MAX_SAFE_INTEGER;
+      return orderA - orderB;
+    });
 
     res.status(200).json({
       status: 'success',
-      data: populatedResults,
+      data: sortedResults,
     });
   } catch (error) {
     next(error);

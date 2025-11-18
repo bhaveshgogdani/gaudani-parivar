@@ -37,6 +37,7 @@ const Header: React.FC = () => {
               <Link to="/admin/manage-villages">{t('navigation.addVillage')}</Link>
               <Link to="/admin/manage-standards">{t('navigation.manageStandards')}</Link>
               <Link to="/admin/manage-results">{t('navigation.manageResults')}</Link>
+              <Link to="/admin/top-three">{t('navigation.topThree')}</Link>
               <Link to="/admin/view-reports">{t('navigation.viewReports')}</Link>
               <div className={styles.kuldevi}>
                 || કુળદેવી આઈ શ્રી ખોડીયાર માતાજી ||

@@ -5,42 +5,91 @@ import { resultApi } from '../../services/api/resultApi';
 import { standardApi } from '../../services/api/standardApi';
 import { Standard } from '../../types/result.types';
 import Layout from '../../components/layout/Layout';
-import Select from '../../components/common/Select/Select';
 import Button from '../../components/common/Button/Button';
 import { saveAs } from 'file-saver';
 import styles from './TopThreeRankingPage.module.css';
+import { useNavigate } from 'react-router-dom';
 
 const TopThreeRankingPage: React.FC = () => {
   const { t } = useTranslation();
   const [standards, setStandards] = useState<Standard[]>([]);
-  const [selectedStandard, setSelectedStandard] = useState('');
-  const [topThree, setTopThree] = useState<any[]>([]);
+  const [gujaratiResults, setGujaratiResults] = useState<any[]>([]);
+  const [englishResults, setEnglishResults] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState<'gujarati' | 'english'>('gujarati');
+  const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
   const isAdmin = localStorage.getItem('adminToken');
+  const navigate = useNavigate();
 
   useEffect(() => {
     loadStandards();
+    loadTopThree();
   }, []);
 
   const loadStandards = async () => {
     try {
       const data = await standardApi.getAll();
-      setStandards(data);
+      // Filter only school level standards
+      const schoolStandards = data.filter((s) => !s.isCollegeLevel);
+      setStandards(schoolStandards);
     } catch (error) {
       console.error('Error loading standards:', error);
     }
   };
 
-  const loadTopThree = async (standardId?: string) => {
+  const loadTopThree = async () => {
     setIsLoading(true);
     try {
-      const data = await reportApi.getTopThree(standardId);
-      setTopThree(data);
+      const [gujaratiData, englishData] = await Promise.all([
+        reportApi.getTopThree(undefined, 'gujarati'),
+        reportApi.getTopThree(undefined, 'english'),
+      ]);
+      
+      // Group by standard
+      const gujaratiGrouped = groupByStandard(gujaratiData);
+      const englishGrouped = groupByStandard(englishData);
+      
+      setGujaratiResults(gujaratiGrouped);
+      setEnglishResults(englishGrouped);
     } catch (error) {
       console.error('Error loading top three:', error);
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const groupByStandard = (data: any[]) => {
+    if (!data || data.length === 0) return [];
+    
+    const grouped: { [key: string]: any } = {};
+    
+    data.forEach((group: any) => {
+      // Handle different possible data structures
+      const standardId = group._id?.standardId?._id || group._id?.standardId || group.standardId;
+      const standardName = group._id?.standardId?.standardName || group.standardName || 'Unknown';
+      
+      if (standardId) {
+        if (!grouped[standardId]) {
+          grouped[standardId] = {
+            standardId,
+            standardName,
+            results: [],
+          };
+        }
+        
+        // Add results from this group
+        if (group.topThree && Array.isArray(group.topThree)) {
+          grouped[standardId].results = [...grouped[standardId].results, ...group.topThree];
+        }
+      }
+    });
+    
+    // Sort by standard display order
+    return Object.values(grouped).sort((a: any, b: any) => {
+      const standardA = standards.find((s) => s._id === a.standardId);
+      const standardB = standards.find((s) => s._id === b.standardId);
+      return (standardA?.displayOrder || 0) - (standardB?.displayOrder || 0);
+    });
   };
 
   const handleDownloadDocx = async () => {
@@ -57,7 +106,7 @@ const TopThreeRankingPage: React.FC = () => {
     if (confirm('Are you sure you want to delete this result?')) {
       try {
         await resultApi.delete(id);
-        loadTopThree(selectedStandard || undefined);
+        loadTopThree();
       } catch (error) {
         alert('Error deleting result');
       }
@@ -68,144 +117,160 @@ const TopThreeRankingPage: React.FC = () => {
     window.print();
   };
 
+  const currentResults = activeTab === 'gujarati' ? gujaratiResults : englishResults;
+
+  const handleImageClick = (imageUrl: string) => {
+    if (imageUrl) {
+      setFullImageUrl(imageUrl);
+    }
+  };
+
+  const handleEditClick = (id: string) => {
+    navigate(`/admin/manage-results?resultId=${id}`);
+  };
+
+  const getImageUrl = (result: any) => {
+    if (result.resultImageUrl) {
+      return result.resultImageUrl;
+    }
+    return '';
+  };
+
   return (
-    <Layout showHeader={false}>
+    <Layout>
       <div className={styles.topThreePage}>
         <h1 className={styles.title}>{t('pages.topThree.title')}</h1>
 
-        <div className={styles.controls}>
-          <Select
-            label={t('pages.topThree.selectStandard')}
-            options={[
-              { value: '', label: t('pages.results.all') },
-              ...standards.map((s) => ({
-                value: s._id,
-                label: s.standardName,
-              })),
-            ]}
-            value={selectedStandard}
-            onChange={(e) => setSelectedStandard(e.target.value)}
-          />
-
-          <div className={styles.actions}>
-            <Button
-              variant="primary"
-              onClick={() => loadTopThree(selectedStandard || undefined)}
-              isLoading={isLoading}
-            >
-              {t('pages.topThree.clickHere')}
-            </Button>
-            <Button variant="secondary" onClick={() => loadTopThree()}>
-              {t('pages.topThree.viewAll')}
-            </Button>
-            <Button variant="success" onClick={handleDownloadDocx}>
-              {t('pages.topThree.downloadDocx')}
-            </Button>
-          </div>
+        <div className={styles.tabs}>
+          <button
+            className={activeTab === 'gujarati' ? styles.activeTab : styles.tab}
+            onClick={() => setActiveTab('gujarati')}
+          >
+            {t('forms.gujarati')} {t('forms.medium')}
+          </button>
+          <button
+            className={activeTab === 'english' ? styles.activeTab : styles.tab}
+            onClick={() => setActiveTab('english')}
+          >
+            {t('forms.english')} {t('forms.medium')}
+          </button>
         </div>
 
-        <div className={styles.topTableContainer}>
-          <h2 className={styles.topTableTitle}>Top 3 List</h2>
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>{t('pages.results.srNo')}</th>
-                <th>{t('pages.results.studentName')}</th>
-                <th>{t('pages.results.standard')}</th>
-                <th>{t('pages.results.percentage')}</th>
-                <th>{t('pages.results.village')}</th>
-                <th>{t('pages.results.contact')}</th>
-                {isAdmin && <th>{t('common.actions')}</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {topThree.length === 0 ? (
-                <tr>
-                  <td colSpan={isAdmin ? 7 : 6} className={styles.emptyCell}>
-                    {t('tables.noData')}
-                  </td>
-                </tr>
-              ) : (
-                topThree.flatMap((group: any) =>
-                  group.topThree?.map((result: any, index: number) => (
-                    <tr key={result._id}>
-                      <td>{index + 1}</td>
-                      <td>{result.studentName}</td>
-                      <td>{result.standardId?.standardName || '-'}</td>
-                      <td>{result.percentage.toFixed(2)}%</td>
-                      <td>{result.villageId?.villageName || '-'}</td>
-                      <td>{result.contactNumber || '-'}</td>
-                      {isAdmin && (
-                        <td>
-                          <Button
-                            variant="danger"
-                            size="small"
-                            onClick={() => handleDelete(result._id)}
-                          >
-                            {t('common.delete')}
-                          </Button>
-                        </td>
-                      )}
-                    </tr>
-                  ))
-                )
-              )}
-            </tbody>
-          </table>
+        <div className={styles.actions}>
+          <Button variant="success" onClick={handleDownloadDocx}>
+            {t('pages.topThree.downloadDocx')}
+          </Button>
+          <Button variant="secondary" onClick={handlePrint}>
+            {t('common.print')}
+          </Button>
         </div>
 
-        {topThree.length > 0 && (
+        {isLoading ? (
+          <div className={styles.loading}>{t('common.loading')}</div>
+        ) : (
           <div className={styles.results}>
-            <h2 className={styles.sectionTitle}>Results Grouped by Standard</h2>
-            {topThree.map((group: any) => (
-              <div key={group._id?._id || 'unknown'} className={styles.group}>
-                <h2 className={styles.groupTitle}>
-                  {group._id?.standardName || 'Unknown Standard'}
-                </h2>
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>{t('pages.results.srNo')}</th>
-                      <th>{t('pages.results.studentName')}</th>
-                      <th>{t('pages.results.percentage')}</th>
-                      <th>{t('pages.results.village')}</th>
-                      <th>{t('pages.results.contact')}</th>
-                      {isAdmin && <th>{t('common.actions')}</th>}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {group.topThree?.map((result: any, index: number) => (
-                      <tr key={result._id}>
-                        <td>{index + 1}</td>
-                        <td>{result.studentName}</td>
-                        <td>{result.percentage.toFixed(2)}%</td>
-                        <td>{result.villageId?.villageName || '-'}</td>
-                        <td>{result.contactNumber || '-'}</td>
-                        {isAdmin && (
-                          <td>
-                            <Button
-                              variant="danger"
-                              size="small"
-                              onClick={() => handleDelete(result._id)}
-                            >
-                              {t('common.delete')}
-                            </Button>
-                          </td>
-                        )}
+            {currentResults.length === 0 ? (
+              <div className={styles.noData}>{t('tables.noData')}</div>
+            ) : (
+              currentResults.map((group: any) => (
+                <div key={group.standardId} className={styles.group}>
+                  <h2 className={styles.groupTitle}>
+                    {group.standardName}
+                  </h2>
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th>Rank</th>
+                        <th>{t('pages.results.studentName')}</th>
+                        <th>{t('pages.results.percentage')}</th>
+                        <th>{t('pages.results.village')}</th>
+                        <th>{t('pages.results.contact')}</th>
+                        <th>{t('common.view')}</th>
+                        {isAdmin && <th>{t('common.actions')}</th>}
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ))}
+                    </thead>
+                    <tbody>
+                      {group.results.length === 0 ? (
+                        <tr>
+                          <td colSpan={isAdmin ? 6 : 5} className={styles.emptyCell}>
+                            {t('tables.noData')}
+                          </td>
+                        </tr>
+                      ) : (
+                        group.results.map((result: any) => {
+                          // Handle village name - could be object or string
+                          const villageName =
+                            typeof result.villageId === 'object'
+                              ? result.villageId?.villageName
+                              : '-';
+
+                          const imageUrl = getImageUrl(result);
+
+                          return (
+                            <tr key={result._id}>
+                              <td>{result.rank || '-'}</td>
+                              <td>{result.studentName}</td>
+                              <td>{result.percentage.toFixed(2)}%</td>
+                              <td>{villageName || '-'}</td>
+                              <td>{result.contactNumber || '-'}</td>
+                              <td>
+                                {imageUrl ? (
+                                  <img
+                                    src={imageUrl}
+                                    alt="Result"
+                                    className={styles.resultThumbnail}
+                                    onClick={() => handleImageClick(imageUrl)}
+                                  />
+                                ) : (
+                                  '-'
+                                )}
+                              </td>
+                              {isAdmin && (
+                                <td>
+                                  <div className={styles.rowActions}>
+                                    <Button
+                                      variant="primary"
+                                      size="small"
+                                      onClick={() => handleEditClick(result._id)}
+                                    >
+                                      {t('common.edit')}
+                                    </Button>
+                                    <Button
+                                      variant="danger"
+                                      size="small"
+                                      onClick={() => handleDelete(result._id)}
+                                    >
+                                      {t('common.delete')}
+                                    </Button>
+                                  </div>
+                                </td>
+                              )}
+                            </tr>
+                          );
+                        })
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              ))
+            )}
           </div>
         )}
 
-        {topThree.length > 0 && (
-          <div className={styles.printActions}>
-            <Button variant="secondary" onClick={handlePrint}>
-              {t('common.print')}
-            </Button>
+        {fullImageUrl && (
+          <div className={styles.imageModalOverlay} onClick={() => setFullImageUrl(null)}>
+            <div
+              className={styles.imageModalContent}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className={styles.closeImageButton}
+                onClick={() => setFullImageUrl(null)}
+              >
+                ×
+              </button>
+              <img src={fullImageUrl} alt="Result" className={styles.fullSizeImage} />
+            </div>
           </div>
         )}
       </div>
@@ -214,4 +279,3 @@ const TopThreeRankingPage: React.FC = () => {
 };
 
 export default TopThreeRankingPage;
-

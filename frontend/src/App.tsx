@@ -9,6 +9,7 @@ import ManageVillages from './pages/ManageVillages';
 import ManageStandards from './pages/ManageStandards';
 import ViewReports from './pages/ViewReports';
 import ManageResults from './pages/ManageResults';
+import TopThreeRankingPage from './pages/TopThreeRankingPage';
 import './App.css';
 
 const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -61,6 +62,14 @@ function App() {
             element={
               <PrivateRoute>
                 <ManageResults />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/top-three"
+            element={
+              <PrivateRoute>
+                <TopThreeRankingPage />
               </PrivateRoute>
             }
           />
