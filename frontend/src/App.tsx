@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { LanguageProvider } from './context/LanguageContext';
+import { ToastProvider } from './context/ToastContext';
 import HomePage from './pages/HomePage';
 import UploadResultPage from './pages/UploadResultPage';
 import AdminLoginPage from './pages/AdminLoginPage';
@@ -22,7 +23,8 @@ const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) 
 function App() {
   return (
     <LanguageProvider>
-      <Router>
+      <ToastProvider>
+        <Router>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/upload-result" element={<UploadResultPage />} />
@@ -80,6 +82,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
+      </ToastProvider>
     </LanguageProvider>
   );
 }

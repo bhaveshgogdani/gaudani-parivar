@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../i18n/useTranslation';
+import { useToast } from '../../context/ToastContext';
 import { standardApi } from '../../services/api/standardApi';
 import { Standard } from '../../types/result.types';
 import Layout from '../../components/layout/Layout';
@@ -9,6 +10,7 @@ import styles from './ManageStandards.module.css';
 
 const ManageStandards: React.FC = () => {
   const { t } = useTranslation();
+  const { showSuccess, showError } = useToast();
   const [standards, setStandards] = useState<Standard[]>([]);
   const [formData, setFormData] = useState({
     standardName: '',
@@ -40,15 +42,15 @@ const ManageStandards: React.FC = () => {
     try {
       if (editingId) {
         await standardApi.update(editingId, formData);
-        alert(t('messages.success.standardUpdated'));
+        showSuccess(t('messages.success.standardUpdated'));
       } else {
         await standardApi.create(formData);
-        alert(t('messages.success.standardAdded'));
+        showSuccess(t('messages.success.standardAdded'));
       }
       handleCloseModal();
       loadStandards();
     } catch (error: any) {
-      alert(error.response?.data?.message || t('messages.error.serverError'));
+      showError(error.response?.data?.message || t('messages.error.serverError'));
     } finally {
       setIsLoading(false);
     }
@@ -94,10 +96,10 @@ const ManageStandards: React.FC = () => {
     if (confirm('Are you sure you want to delete this standard?')) {
       try {
         await standardApi.delete(id);
-        alert(t('messages.success.standardDeleted'));
+        showSuccess(t('messages.success.standardDeleted'));
         loadStandards();
       } catch (error) {
-        alert('Error deleting standard');
+        showError('Error deleting standard');
       }
     }
   };

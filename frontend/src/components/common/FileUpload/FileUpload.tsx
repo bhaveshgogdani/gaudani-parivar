@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useToast } from '../../../context/ToastContext';
 import styles from './FileUpload.module.css';
 
 interface FileUploadProps {
@@ -18,6 +19,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
   error,
   value,
 }) => {
+  const { showError } = useToast();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const isOpeningRef = useRef<boolean>(false);
@@ -30,7 +32,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
 
     if (file) {
       if (file.size > maxSize) {
-        alert(`File size exceeds ${maxSize / 1024 / 1024}MB limit`);
+        showError(`File size exceeds ${maxSize / 1024 / 1024}MB limit`);
         if (fileInputRef.current) {
           fileInputRef.current.value = '';
         }

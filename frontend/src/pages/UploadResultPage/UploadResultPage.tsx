@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/useTranslation';
+import { useToast } from '../../context/ToastContext';
 import { resultApi } from '../../services/api/resultApi';
 import { villageApi } from '../../services/api/villageApi';
 import { standardApi } from '../../services/api/standardApi';
@@ -53,6 +54,7 @@ type ResultFormData = z.infer<typeof resultSchema>;
 
 const UploadResultPage: React.FC = () => {
   const { t } = useTranslation();
+  const { showError, showWarning } = useToast();
   const navigate = useNavigate();
   const [villages, setVillages] = useState<Village[]>([]);
   const [standards, setStandards] = useState<Standard[]>([]);
@@ -113,7 +115,7 @@ const UploadResultPage: React.FC = () => {
 
   const onSubmit = async (data: ResultFormData) => {
     if (!resultImage) {
-      alert(t('validation.resultImageRequired'));
+      showWarning(t('validation.resultImageRequired'));
       setIsLoading(false);
       return;
     }
@@ -128,7 +130,7 @@ const UploadResultPage: React.FC = () => {
       // Navigate to success page with contact number
       navigate('/result-success', { state: { contactNumber: data.contactNumber } });
     } catch (error: any) {
-      alert(error.response?.data?.message || t('messages.error.serverError'));
+      showError(error.response?.data?.message || t('messages.error.serverError'));
     } finally {
       setIsLoading(false);
     }

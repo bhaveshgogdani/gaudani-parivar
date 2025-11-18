@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../../i18n/useTranslation';
+import { useToast } from '../../context/ToastContext';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { resultApi } from '../../services/api/resultApi';
 import { villageApi } from '../../services/api/villageApi';
@@ -14,6 +15,7 @@ import styles from './ViewResultsPage.module.css';
 
 const ViewResultsPage: React.FC = () => {
   const { t } = useTranslation();
+  const { showError, showWarning } = useToast();
   const location = useLocation();
   const navigate = useNavigate();
   const hasProcessedStateRef = useRef(false);
@@ -36,7 +38,7 @@ const ViewResultsPage: React.FC = () => {
     const searchNumber = number || mobileNumber;
     
     if (!searchNumber || !/^[0-9]{10}$/.test(searchNumber)) {
-      alert(t('validation.contactNumberRequired'));
+      showWarning(t('validation.contactNumberRequired'));
       return;
     }
 
@@ -56,7 +58,7 @@ const ViewResultsPage: React.FC = () => {
       setResults(filteredResults);
     } catch (error) {
       console.error('Error searching results:', error);
-      alert(t('messages.error.serverError'));
+      showError(t('messages.error.serverError'));
     } finally {
       setIsLoading(false);
     }
@@ -181,7 +183,7 @@ const ViewResultsPage: React.FC = () => {
           handleSearchByMobile();
         }
       } catch (error) {
-        alert(t('messages.error.serverError'));
+        showError(t('messages.error.serverError'));
       }
     }
   };

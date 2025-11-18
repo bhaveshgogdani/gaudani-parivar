@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../i18n/useTranslation';
+import { useToast } from '../../context/ToastContext';
 import { villageApi } from '../../services/api/villageApi';
 import { Village } from '../../types/result.types';
 import Layout from '../../components/layout/Layout';
@@ -9,6 +10,7 @@ import styles from './ManageVillages.module.css';
 
 const ManageVillages: React.FC = () => {
   const { t } = useTranslation();
+  const { showSuccess, showError } = useToast();
   const [villages, setVillages] = useState<Village[]>([]);
   const [formData, setFormData] = useState({ villageName: '', isActive: true });
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -34,15 +36,15 @@ const ManageVillages: React.FC = () => {
     try {
       if (editingId) {
         await villageApi.update(editingId, formData);
-        alert(t('messages.success.villageUpdated'));
+        showSuccess(t('messages.success.villageUpdated'));
       } else {
         await villageApi.create(formData);
-        alert(t('messages.success.villageAdded'));
+        showSuccess(t('messages.success.villageAdded'));
       }
       handleCloseModal();
       loadVillages();
     } catch (error: any) {
-      alert(error.response?.data?.message || t('messages.error.serverError'));
+      showError(error.response?.data?.message || t('messages.error.serverError'));
     } finally {
       setIsLoading(false);
     }
@@ -70,10 +72,10 @@ const ManageVillages: React.FC = () => {
     if (confirm('Are you sure you want to delete this village?')) {
       try {
         await villageApi.delete(id);
-        alert(t('messages.success.villageDeleted'));
+        showSuccess(t('messages.success.villageDeleted'));
         loadVillages();
       } catch (error) {
-        alert('Error deleting village');
+        showError('Error deleting village');
       }
     }
   };

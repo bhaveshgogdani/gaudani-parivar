@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../i18n/useTranslation';
+import { useToast } from '../../context/ToastContext';
 import { resultApi } from '../../services/api/resultApi';
 import { villageApi } from '../../services/api/villageApi';
 import { standardApi } from '../../services/api/standardApi';
@@ -54,6 +55,7 @@ type ResultFormData = z.infer<typeof resultSchema>;
 
 const ManageResults: React.FC = () => {
   const { t } = useTranslation();
+  const { showSuccess, showError } = useToast();
   const [results, setResults] = useState<Result[]>([]);
   const [villages, setVillages] = useState<Village[]>([]);
   const [standards, setStandards] = useState<Standard[]>([]);
@@ -192,18 +194,18 @@ const ManageResults: React.FC = () => {
   };
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this result?')) {
+    if (window.confirm(t('messages.confirm.deleteResult'))) {
       try {
         await resultApi.delete(id);
-        alert(t('messages.success.resultDeleted'));
+        showSuccess(t('messages.success.resultDeleted'));
         loadResults();
       } catch (error) {
-        alert(t('messages.error.serverError'));
+        showError(t('messages.error.serverError'));
       }
     }
   };
 
-  const onSubmit = async (data: ResultFormData) => {
+  const onSubmit = async (data: ResultFormData, closeAfterSave: boolean = false) => {
     if (!selectedResult) return;
     
     setIsLoading(true);
@@ -216,14 +218,89 @@ const ManageResults: React.FC = () => {
       }
       
       await resultApi.update(selectedResult._id, resultData);
-      alert(t('messages.success.resultUpdated'));
-      handleCloseModal();
-      loadResults();
+      showSuccess(t('messages.success.resultUpdated'));
+      
+      // Reload results to get updated data
+      const filtersToApply: any = {
+        medium: activeTab,
+        limit: 10000,
+      };
+      if (filters.standardId) filtersToApply.standardId = filters.standardId;
+      if (filters.villageId) filtersToApply.villageId = filters.villageId;
+      
+      const response = await resultApi.getAll(filtersToApply);
+      const updatedResults = response.data;
+      setResults(updatedResults);
+      
+      // If save and close, close the modal
+      if (closeAfterSave) {
+        handleCloseModal();
+      } else {
+        // If just save, find the updated result and keep modal open
+        const updatedResult = updatedResults.find(r => r._id === selectedResult._id);
+        if (updatedResult) {
+          setSelectedResult(updatedResult);
+          // Reset form with updated data
+          const standardId = typeof updatedResult.standardId === 'object' ? updatedResult.standardId._id : updatedResult.standardId;
+          const villageId = typeof updatedResult.villageId === 'object' ? updatedResult.villageId._id : updatedResult.villageId;
+          reset({
+            studentName: updatedResult.studentName,
+            standardId: standardId,
+            medium: updatedResult.medium,
+            totalMarks: updatedResult.totalMarks,
+            obtainedMarks: updatedResult.obtainedMarks,
+            percentage: updatedResult.percentage,
+            villageId: villageId,
+            contactNumber: updatedResult.contactNumber || '',
+            isApproved: updatedResult.isApproved || false,
+          });
+          setResultImage(null); // Clear image selection after save
+        }
+      }
     } catch (error: any) {
-      alert(error.response?.data?.message || t('messages.error.serverError'));
+      showError(error.response?.data?.message || t('messages.error.serverError'));
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSave = async (data: ResultFormData) => {
+    await onSubmit(data, false);
+  };
+
+  const handleSaveAndClose = async (data: ResultFormData) => {
+    await onSubmit(data, true);
+  };
+
+  const getCurrentResultIndex = () => {
+    if (!selectedResult) return -1;
+    return results.findIndex(r => r._id === selectedResult._id);
+  };
+
+  const handleNext = () => {
+    const currentIndex = getCurrentResultIndex();
+    if (currentIndex >= 0 && currentIndex < results.length - 1) {
+      const nextResult = results[currentIndex + 1];
+      handleEdit(nextResult);
+    }
+  };
+
+  const handlePrevious = () => {
+    const currentIndex = getCurrentResultIndex();
+    if (currentIndex > 0) {
+      const prevResult = results[currentIndex - 1];
+      handleEdit(prevResult);
+    }
+  };
+
+  const canNavigateNext = () => {
+    const currentIndex = getCurrentResultIndex();
+    return currentIndex >= 0 && currentIndex < results.length - 1;
+  };
+
+  const canNavigatePrevious = () => {
+    const currentIndex = getCurrentResultIndex();
+    return currentIndex > 0;
   };
 
   const handleImageClick = (imageUrl: string) => {
@@ -382,13 +459,36 @@ const ManageResults: React.FC = () => {
             <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
               <div className={styles.modalHeader}>
                 <h2>{t('common.edit')}</h2>
-                <button className={styles.closeButton} onClick={handleCloseModal}>
-                  ×
-                </button>
+                <div className={styles.modalHeaderRight}>
+                  {results.length > 1 && (
+                    <div className={styles.navigationButtons}>
+                      <button
+                        className={styles.navButton}
+                        onClick={handlePrevious}
+                        disabled={!canNavigatePrevious()}
+                      >
+                        {t('common.previous')}
+                      </button>
+                      <span className={styles.navInfo}>
+                        {getCurrentResultIndex() + 1} / {results.length}
+                      </span>
+                      <button
+                        className={styles.navButton}
+                        onClick={handleNext}
+                        disabled={!canNavigateNext()}
+                      >
+                        {t('common.next')}
+                      </button>
+                    </div>
+                  )}
+                  <button className={styles.closeButton} onClick={handleCloseModal}>
+                    ×
+                  </button>
+                </div>
               </div>
               <div className={styles.modalBody}>
                 <div className={styles.modalLeft}>
-                  <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+                  <form onSubmit={(e) => e.preventDefault()} className={styles.form}>
                       <Input
                         label={<>{t('forms.studentName')} <span className={styles.required}>*</span></>}
                         {...register('studentName')}
@@ -499,8 +599,21 @@ const ManageResults: React.FC = () => {
                       />
 
                       <div className={styles.modalActions}>
-                        <Button type="submit" variant="primary" isLoading={isLoading}>
+                        <Button 
+                          type="button" 
+                          variant="primary" 
+                          onClick={handleSubmit(handleSave)}
+                          isLoading={isLoading}
+                        >
                           {t('common.save')}
+                        </Button>
+                        <Button 
+                          type="button" 
+                          variant="success" 
+                          onClick={handleSubmit(handleSaveAndClose)}
+                          isLoading={isLoading}
+                        >
+                          {t('common.saveAndClose')}
                         </Button>
                         <Button type="button" variant="danger" onClick={handleCloseModal}>
                           {t('common.cancel')}

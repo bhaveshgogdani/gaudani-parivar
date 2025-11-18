@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../i18n/useTranslation';
+import { useToast } from '../../context/ToastContext';
 import { reportApi } from '../../services/api/reportApi';
 import { resultApi } from '../../services/api/resultApi';
 import { standardApi } from '../../services/api/standardApi';
@@ -12,6 +13,7 @@ import { useNavigate } from 'react-router-dom';
 
 const TopThreeRankingPage: React.FC = () => {
   const { t } = useTranslation();
+  const { showError } = useToast();
   const [standards, setStandards] = useState<Standard[]>([]);
   const [gujaratiResults, setGujaratiResults] = useState<any[]>([]);
   const [englishResults, setEnglishResults] = useState<any[]>([]);
@@ -97,7 +99,7 @@ const TopThreeRankingPage: React.FC = () => {
       const blob = await reportApi.exportTopThreeDocx();
       saveAs(blob, 'top-three-ranking.docx');
     } catch (error) {
-      alert('Error downloading file');
+      showError('Error downloading file');
     }
   };
 
@@ -108,7 +110,7 @@ const TopThreeRankingPage: React.FC = () => {
         await resultApi.delete(id);
         loadTopThree();
       } catch (error) {
-        alert('Error deleting result');
+        showError('Error deleting result');
       }
     }
   };

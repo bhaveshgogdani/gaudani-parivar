@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../i18n/useTranslation';
+import { useToast } from '../../context/ToastContext';
 import { reportApi } from '../../services/api/reportApi';
 import { villageApi } from '../../services/api/villageApi';
 import { standardApi } from '../../services/api/standardApi';
@@ -14,6 +15,7 @@ import styles from './ViewReports.module.css';
 
 const ViewReports: React.FC = () => {
   const { t } = useTranslation();
+  const { showError } = useToast();
   const [villages, setVillages] = useState<Village[]>([]);
   const [standards, setStandards] = useState<Standard[]>([]);
   const [filters, setFilters] = useState({
@@ -87,7 +89,7 @@ const ViewReports: React.FC = () => {
       });
       saveAs(blob, `report.${format === 'pdf' ? 'pdf' : 'xlsx'}`);
     } catch (error) {
-      alert('Error exporting report');
+      showError('Error exporting report');
     }
   };
 

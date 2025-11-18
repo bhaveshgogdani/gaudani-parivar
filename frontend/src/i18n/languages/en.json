@@ -17,7 +17,10 @@
     "download": "Download",
     "export": "Export",
     "view": "View",
-    "actions": "Actions"
+    "actions": "Actions",
+    "next": "Next",
+    "previous": "Previous",
+    "saveAndClose": "Save and Close"
   },
   "navigation": {
     "home": "Gaudani Parivar",
