@@ -22,6 +22,7 @@
   "navigation": {
     "home": "Gaudani Parivar",
     "addResult": "Add New Result",
+    "viewResult": "View Result",
     "addVillage": "Village",
     "studentList": "Student List",
     "topThree": "Top 3 List",
@@ -66,6 +67,9 @@
       "villageDeleted": "Village deleted successfully",
       "standardDeleted": "Standard deleted successfully",
       "loginSuccess": "Login successful"
+    },
+    "confirm": {
+      "deleteResult": "Are you sure you want to delete this result?"
     },
     "error": {
       "required": "This field is required",
@@ -114,7 +118,26 @@
       "selectStandard": "Select Standard",
       "clickHere": "Click Here",
       "viewAll": "View All",
-      "downloadDocx": "Download All first 3 Rank Docx"
+      "downloadDocx": "Download All first 3 Rank Docx",
+      "rank": "Rank"
+    },
+    "success": {
+      "title": "Thank You!",
+      "message": "Your result submitted successfully, you can see your results by your mobile no.",
+      "mobileNumber": "Mobile Number",
+      "viewUploadedResults": "View Uploaded Results",
+      "addAnotherResult": "Add Another Result",
+      "goToHome": "Go to Home"
+    },
+    "viewResults": {
+      "searchTitle": "Search Your Results",
+      "searchSubtitle": "Enter your 10-digit mobile number to view all your submitted results",
+      "mobileNumber": "Mobile Number",
+      "mobileNumberPlaceholder": "Enter 10-digit mobile number",
+      "yourResults": "Your Results",
+      "noResultsMessage": "No results found for mobile number:",
+      "checkMobileNumber": "Please check your mobile number and try again.",
+      "resultImage": "Result Image"
     },
     "admin": {
       "login": {

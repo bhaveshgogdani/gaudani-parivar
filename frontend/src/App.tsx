@@ -10,6 +10,8 @@ import ManageStandards from './pages/ManageStandards';
 import ViewReports from './pages/ViewReports';
 import ManageResults from './pages/ManageResults';
 import TopThreeRankingPage from './pages/TopThreeRankingPage';
+import ResultSuccessPage from './pages/ResultSuccessPage';
+import ViewResultsPage from './pages/ViewResultsPage';
 import './App.css';
 
 const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -24,6 +26,8 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/upload-result" element={<UploadResultPage />} />
+          <Route path="/view-results" element={<ViewResultsPage />} />
+          <Route path="/result-success" element={<ResultSuccessPage />} />
           <Route path="/admin/login" element={<AdminLoginPage />} />
           <Route
             path="/admin"

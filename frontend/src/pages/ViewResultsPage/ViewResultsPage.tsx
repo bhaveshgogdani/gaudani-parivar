@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from '../../i18n/useTranslation';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { resultApi } from '../../services/api/resultApi';
 import { villageApi } from '../../services/api/villageApi';
 import { standardApi } from '../../services/api/standardApi';
@@ -13,9 +14,13 @@ import styles from './ViewResultsPage.module.css';
 
 const ViewResultsPage: React.FC = () => {
   const { t } = useTranslation();
+  const location = useLocation();
+  const navigate = useNavigate();
+  const hasProcessedStateRef = useRef(false);
   const [results, setResults] = useState<Result[]>([]);
   const [villages, setVillages] = useState<Village[]>([]);
   const [standards, setStandards] = useState<Standard[]>([]);
+  const [mobileNumber, setMobileNumber] = useState('');
   const [filters, setFilters] = useState({
     standardId: '',
     villageId: '',
@@ -23,16 +28,67 @@ const ViewResultsPage: React.FC = () => {
     search: '',
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const isAdmin = localStorage.getItem('adminToken');
 
+  const handleSearchByMobile = async (number?: string) => {
+    const searchNumber = number || mobileNumber;
+    
+    if (!searchNumber || !/^[0-9]{10}$/.test(searchNumber)) {
+      alert(t('validation.contactNumberRequired'));
+      return;
+    }
+
+    setIsLoading(true);
+    setHasSearched(true);
+    try {
+      // Search by contact number - backend now supports searching by contact number
+      const response = await resultApi.getAll({
+        search: searchNumber,
+      });
+      
+      // Filter results by exact contact number match (backend search might be partial)
+      const filteredResults = response.data.filter(
+        (result) => result.contactNumber === searchNumber
+      );
+      
+      setResults(filteredResults);
+    } catch (error) {
+      console.error('Error searching results:', error);
+      alert(t('messages.error.serverError'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   useEffect(() => {
-    loadData();
+    // Only process location.state once when component mounts
+    // This prevents it from persisting after refresh
+    if (!hasProcessedStateRef.current && location.state?.contactNumber) {
+      const contactNumber = location.state.contactNumber;
+      hasProcessedStateRef.current = true;
+      
+      // Set mobile number and search
+      setMobileNumber(contactNumber);
+      handleSearchByMobile(contactNumber);
+      
+      // Clear the location state by replacing it with undefined
+      // This prevents the number from persisting after refresh
+      navigate(location.pathname, { replace: true, state: undefined });
+    }
+    
+    if (isAdmin) {
+      loadData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    loadResults();
-  }, [filters]);
+    if (isAdmin) {
+      loadResults();
+    }
+  }, [filters, isAdmin]);
 
   const loadData = async () => {
     try {
@@ -116,16 +172,136 @@ const ViewResultsPage: React.FC = () => {
 
   const handleDelete = async (id: string) => {
     if (!isAdmin) return;
-    if (confirm('Are you sure you want to delete this result?')) {
+    if (confirm(t('messages.confirm.deleteResult'))) {
       try {
         await resultApi.delete(id);
-        loadResults();
+        if (isAdmin) {
+          loadResults();
+        } else {
+          handleSearchByMobile();
+        }
       } catch (error) {
-        alert('Error deleting result');
+        alert(t('messages.error.serverError'));
       }
     }
   };
 
+  const getImageUrl = (result: Result) => {
+    if (result.resultImageUrl) {
+      // Use relative URL so it goes through Vite proxy in development
+      return result.resultImageUrl;
+    }
+    return '';
+  };
+
+  // Public view - mobile number search
+  if (!isAdmin) {
+    return (
+      <Layout>
+        <div className={styles.resultsPage}>
+          <div className={styles.searchSection}>
+            <div className={styles.searchCard}>
+              <h2 className={styles.searchTitle}>{t('pages.viewResults.searchTitle')}</h2>
+              <p className={styles.searchSubtitle}>
+                {t('pages.viewResults.searchSubtitle')}
+              </p>
+              <div className={styles.mobileSearch}>
+                <Input
+                  label={t('pages.viewResults.mobileNumber')}
+                  type="tel"
+                  maxLength={10}
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value)}
+                  placeholder={t('pages.viewResults.mobileNumberPlaceholder')}
+                />
+                <Button
+                  variant="primary"
+                  onClick={() => handleSearchByMobile()}
+                  isLoading={isLoading}
+                >
+                  {t('common.search')}
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {hasSearched && (
+            <div className={styles.resultsSection}>
+              {isLoading ? (
+                <div className={styles.loading}>{t('common.loading')}</div>
+              ) : results.length === 0 ? (
+                <div className={styles.noResults}>
+                  <p>{t('pages.viewResults.noResultsMessage')} <strong>{mobileNumber}</strong></p>
+                  <p>{t('pages.viewResults.checkMobileNumber')}</p>
+                </div>
+              ) : (
+                <>
+                  <div className={styles.resultsHeader}>
+                    <h2>{t('pages.viewResults.yourResults')} ({results.length})</h2>
+                    <p>{t('pages.success.mobileNumber')}: <strong>{mobileNumber}</strong></p>
+                  </div>
+                  <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                      <thead>
+                        <tr>
+                          <th>{t('pages.results.srNo')}</th>
+                          <th>{t('pages.results.studentName')}</th>
+                          <th>{t('pages.results.standard')}</th>
+                          <th>{t('pages.results.percentage')}</th>
+                          <th>{t('pages.results.village')}</th>
+                          <th>{t('pages.viewResults.resultImage')}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {results.map((result, index) => (
+                          <tr key={result._id}>
+                            <td>{index + 1}</td>
+                            <td>{result.studentName}</td>
+                            <td>
+                              {typeof result.standardId === 'object'
+                                ? result.standardId.standardName
+                                : ''}
+                            </td>
+                            <td>{result.percentage.toFixed(2)}%</td>
+                            <td>
+                              {typeof result.villageId === 'object'
+                                ? result.villageId.villageName
+                                : ''}
+                            </td>
+                            <td>
+                              {result.resultImageUrl && (
+                                <Button
+                                  variant="success"
+                                  size="small"
+                                  onClick={() => setSelectedImage(getImageUrl(result))}
+                                >
+                                  {t('common.view')}
+                                </Button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+
+          {selectedImage && (
+            <ImageModal
+              imageUrl={selectedImage}
+              onClose={() => setSelectedImage(null)}
+              alt="Result Image"
+            />
+          )}
+        </div>
+      </Layout>
+    );
+  }
+
+  // Admin view - full filters
   return (
     <Layout showHeader={false}>
       <div className={styles.resultsPage}>
@@ -231,8 +407,7 @@ const ViewResultsPage: React.FC = () => {
                             variant="success"
                             size="small"
                             onClick={() => {
-                              // Use relative URL so it goes through Vite proxy in development
-                              setSelectedImage(result.resultImageUrl || '');
+                              setSelectedImage(getImageUrl(result));
                             }}
                             style={{ marginRight: '0.5rem' }}
                           >
@@ -268,4 +443,3 @@ const ViewResultsPage: React.FC = () => {
 };
 
 export default ViewResultsPage;
-

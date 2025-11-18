@@ -99,7 +99,11 @@ export const getResults = async (req, res, next) => {
     }
 
     if (search) {
-      query.studentName = { $regex: search, $options: 'i' };
+      // Search by student name or contact number
+      query.$or = [
+        { studentName: { $regex: search, $options: 'i' } },
+        { contactNumber: search },
+      ];
     }
 
     const pageNum = parseInt(page, 10);

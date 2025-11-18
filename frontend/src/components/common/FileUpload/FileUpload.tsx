@@ -20,13 +20,20 @@ const FileUpload: React.FC<FileUploadProps> = ({
 }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [preview, setPreview] = useState<string | null>(null);
+  const isOpeningRef = useRef<boolean>(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Reset the flag when file changes
+    isOpeningRef.current = false;
+    
     const file = e.target.files?.[0] || null;
 
     if (file) {
       if (file.size > maxSize) {
         alert(`File size exceeds ${maxSize / 1024 / 1024}MB limit`);
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
         return;
       }
 
@@ -47,7 +54,9 @@ const FileUpload: React.FC<FileUploadProps> = ({
     onChange(file);
   };
 
-  const handleRemove = () => {
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -55,21 +64,50 @@ const FileUpload: React.FC<FileUploadProps> = ({
     onChange(null);
   };
 
+  const handleUploadAreaClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Prevent double triggers
+    if (isOpeningRef.current) {
+      e.stopPropagation();
+      return;
+    }
+    
+    // Don't trigger if clicking the remove button
+    const target = e.target as HTMLElement;
+    if (target.closest('button')) {
+      return;
+    }
+    
+    // Stop propagation to avoid event bubbling issues
+    e.stopPropagation();
+    
+    // Set flag to prevent double triggers
+    isOpeningRef.current = true;
+    
+    // Programmatically trigger the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+    
+    // Reset flag after a short delay
+    setTimeout(() => {
+      isOpeningRef.current = false;
+    }, 300);
+  };
+
   return (
     <div className={styles.fileUploadWrapper}>
       {label && <label className={styles.label}>{label}</label>}
-      <div className={styles.uploadArea}>
+      <div className={styles.uploadArea} onClick={handleUploadAreaClick}>
         <input
           ref={fileInputRef}
           type="file"
           accept={accept}
           onChange={handleFileChange}
           className={styles.fileInput}
-          id="file-upload"
         />
-        <label htmlFor="file-upload" className={styles.fileLabel}>
+        <div className={styles.fileLabel}>
           {value ? value.name : 'Choose file or drag and drop'}
-        </label>
+        </div>
         {value && (
           <button
             type="button"
@@ -91,4 +129,3 @@ const FileUpload: React.FC<FileUploadProps> = ({
 };
 
 export default FileUpload;
-

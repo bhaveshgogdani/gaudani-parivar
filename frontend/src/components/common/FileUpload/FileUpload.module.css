@@ -28,14 +28,24 @@
   border-radius: 4px;
   background-color: #f9f9f9;
   transition: border-color 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  min-height: 48px;
 }
 
 .uploadArea:hover {
   border-color: #4caf50;
+  background-color: #f5f5f5;
 }
 
 .fileInput {
-  display: none;
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
 }
 
 .fileLabel {
@@ -43,6 +53,9 @@
   cursor: pointer;
   font-family: 'Noto Sans Gujarati', sans-serif;
   color: #666;
+  pointer-events: none;
+  z-index: 0;
+  position: relative;
 }
 
 .removeButton {
@@ -54,6 +67,8 @@
   cursor: pointer;
   font-size: 0.875rem;
   font-family: 'Noto Sans Gujarati', sans-serif;
+  position: relative;
+  z-index: 20;
 }
 
 .removeButton:hover {
@@ -80,4 +95,3 @@
   font-size: 0.875rem;
   font-family: 'Noto Sans Gujarati', sans-serif;
 }
-

@@ -9,7 +9,6 @@ import { villageApi } from '../../services/api/villageApi';
 import { standardApi } from '../../services/api/standardApi';
 import { Village, Standard, CreateResultData } from '../../types/result.types';
 import Layout from '../../components/layout/Layout';
-import LanguageSwitcher from '../../components/common/LanguageSwitcher/LanguageSwitcher';
 import Input from '../../components/common/Input/Input';
 import Select from '../../components/common/Select/Select';
 import FileUpload from '../../components/common/FileUpload/FileUpload';
@@ -126,10 +125,8 @@ const UploadResultPage: React.FC = () => {
         resultImage: resultImage,
       };
       await resultApi.create(resultData);
-      alert(t('messages.success.resultAdded'));
-      reset();
-      setResultImage(null);
-      setCalculatedPercentage(null);
+      // Navigate to success page with contact number
+      navigate('/result-success', { state: { contactNumber: data.contactNumber } });
     } catch (error: any) {
       alert(error.response?.data?.message || t('messages.error.serverError'));
     } finally {
@@ -144,26 +141,11 @@ const UploadResultPage: React.FC = () => {
   };
 
   return (
-    <Layout showHeader={false}>
+    <Layout>
       <div className={styles.uploadPage}>
-        <div className={styles.headerRow}>
-          <Button
-            variant="secondary"
-            size="small"
-            onClick={() => navigate('/')}
-            className={styles.homeButton}
-            title={t('navigation.home')}
-          >
-            <span className={styles.homeIcon}>🏠</span>
-            <span className={styles.homeText}>{t('navigation.home')}</span>
-          </Button>
-          <div className={styles.titleSection}>
-            <h1 className={styles.title}>{t('pages.upload.title')}</h1>
-            <p className={styles.subtitle}>{t('pages.upload.subtitle')}</p>
-          </div>
-          <div className={styles.languageSwitcher}>
-            <LanguageSwitcher />
-          </div>
+        <div className={styles.titleSection}>
+          <h1 className={styles.title}>{t('pages.upload.title')}</h1>
+          <p className={styles.subtitle}>{t('pages.upload.subtitle')}</p>
         </div>
 
         <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>

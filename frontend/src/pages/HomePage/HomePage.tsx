@@ -2,7 +2,6 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from '../../i18n/useTranslation';
 import Layout from '../../components/layout/Layout';
-import LanguageSwitcher from '../../components/common/LanguageSwitcher/LanguageSwitcher';
 import Button from '../../components/common/Button/Button';
 import styles from './HomePage.module.css';
 
@@ -11,11 +10,8 @@ const HomePage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <Layout showHeader={false} showFooter={true}>
+    <Layout>
       <div className={styles.homePage}>
-        <div className={styles.languageSwitcher}>
-          <LanguageSwitcher />
-        </div>
         <div className={styles.headerSection}>
           <h1 className={styles.title}>{t('pages.home.title')}</h1>
           <div className={styles.kuldevi}>

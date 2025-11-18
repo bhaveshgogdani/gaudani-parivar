@@ -24,8 +24,8 @@ const Header: React.FC = () => {
         <nav className={styles.nav}>
           {!isAdmin && (
             <>
-              <Link to="/">{t('navigation.home')}</Link>
               <Link to="/upload-result">{t('navigation.addResult')}</Link>
+              <Link to="/view-results">{t('navigation.viewResult')}</Link>
               <div className={styles.kuldevi}>
                 || કુળદેવી આઈ શ્રી ખોડીયાર માતાજી ||
               </div>
