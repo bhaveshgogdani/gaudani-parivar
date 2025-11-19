@@ -1,5 +1,4 @@
 import api from './api';
-import { Result } from '../../types/result.types';
 
 export const reportApi = {
   getTopThree: async (standardId?: string, medium?: string): Promise<any> => {
@@ -9,9 +8,9 @@ export const reportApi = {
     return response.data.data;
   },
 
-  exportTopThreeDocx: async (standardId?: string): Promise<Blob> => {
-    const response = await api.get('/reports/top-three-export', {
-      params: { standardId },
+  exportTopThreePdf: async (medium?: string): Promise<Blob> => {
+    const response = await api.get('/reports/top-three-pdf', {
+      params: { medium },
       responseType: 'blob',
     });
     return response.data;

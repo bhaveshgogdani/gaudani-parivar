@@ -1,7 +1,7 @@
 import express from 'express';
 import {
   getTopThree,
-  exportTopThreeDocx,
+  exportTopThreePdf,
   getAwardsList,
   getSummary,
   exportReport,
@@ -25,7 +25,7 @@ router.get('/top-performers', authMiddleware, getTopPerformers);
 router.get('/awards/first-rank', authMiddleware, getAwardsList);
 router.get('/awards/second-rank', authMiddleware, getAwardsList);
 router.get('/awards/export', authMiddleware, exportAwardsDocx);
-router.get('/top-three-export', authMiddleware, exportTopThreeDocx);
+router.get('/top-three-pdf', authMiddleware, exportTopThreePdf);
 router.get('/export', authMiddleware, exportReport);
 
 export default router;

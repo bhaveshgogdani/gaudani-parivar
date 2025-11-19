@@ -9,24 +9,31 @@
     "start": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "add-villages": "node scripts/addVillages.js",
-    "add-standards": "node scripts/addStandards.js"
+    "add-standards": "node scripts/addStandards.js",
+    "download-font": "node scripts/downloadFont.js"
   },
-  "keywords": ["gaudani", "result", "upload"],
+  "keywords": [
+    "gaudani",
+    "result",
+    "upload"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "docx": "^8.5.0",
+    "dotenv": "^16.4.7",
+    "exceljs": "^4.4.0",
     "express": "^4.21.2",
+    "fontkit": "^2.0.4",
+    "helmet": "^8.0.0",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.9.2",
     "multer": "^2.0.1",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "joi": "^17.13.3",
-    "helmet": "^8.0.0",
-    "jsonwebtoken": "^9.0.2",
-    "bcryptjs": "^2.4.3",
     "pdfkit": "^0.15.0",
-    "exceljs": "^4.4.0",
-    "docx": "^8.5.0"
+    "pdfmake": "^0.2.20"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
@@ -45,4 +52,3 @@
     }
   }
 }
-

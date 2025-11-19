@@ -121,7 +121,7 @@
       "selectStandard": "Select Standard",
       "clickHere": "Click Here",
       "viewAll": "View All",
-      "downloadDocx": "Download All first 3 Rank Docx",
+      "downloadPdf": "Download PDF (Rank Wise)",
       "rank": "Rank"
     },
     "success": {

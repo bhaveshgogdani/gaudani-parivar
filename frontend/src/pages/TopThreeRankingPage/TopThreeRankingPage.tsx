@@ -94,12 +94,12 @@ const TopThreeRankingPage: React.FC = () => {
     });
   };
 
-  const handleDownloadDocx = async () => {
+  const handleDownloadPdf = async () => {
     try {
-      const blob = await reportApi.exportTopThreeDocx();
-      saveAs(blob, 'top-three-ranking.docx');
+      const blob = await reportApi.exportTopThreePdf(activeTab);
+      saveAs(blob, 'top-three-ranking.pdf');
     } catch (error) {
-      showError('Error downloading file');
+      showError('Error downloading PDF');
     }
   };
 
@@ -159,8 +159,8 @@ const TopThreeRankingPage: React.FC = () => {
         </div>
 
         <div className={styles.actions}>
-          <Button variant="success" onClick={handleDownloadDocx}>
-            {t('pages.topThree.downloadDocx')}
+          <Button variant="primary" onClick={handleDownloadPdf}>
+            {t('pages.topThree.downloadPdf')}
           </Button>
           <Button variant="secondary" onClick={handlePrint}>
             {t('common.print')}
