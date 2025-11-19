@@ -71,6 +71,7 @@ const ManageResults: React.FC = () => {
   const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
   const [calculatedPercentage, setCalculatedPercentage] = useState<number | null>(null);
   const [autoOpenedResultId, setAutoOpenedResultId] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -274,13 +275,13 @@ const ManageResults: React.FC = () => {
 
   const getCurrentResultIndex = () => {
     if (!selectedResult) return -1;
-    return results.findIndex(r => r._id === selectedResult._id);
+    return sortedResults.findIndex(r => r._id === selectedResult._id);
   };
 
   const handleNext = () => {
     const currentIndex = getCurrentResultIndex();
-    if (currentIndex >= 0 && currentIndex < results.length - 1) {
-      const nextResult = results[currentIndex + 1];
+    if (currentIndex >= 0 && currentIndex < sortedResults.length - 1) {
+      const nextResult = sortedResults[currentIndex + 1];
       handleEdit(nextResult);
     }
   };
@@ -288,14 +289,14 @@ const ManageResults: React.FC = () => {
   const handlePrevious = () => {
     const currentIndex = getCurrentResultIndex();
     if (currentIndex > 0) {
-      const prevResult = results[currentIndex - 1];
+      const prevResult = sortedResults[currentIndex - 1];
       handleEdit(prevResult);
     }
   };
 
   const canNavigateNext = () => {
     const currentIndex = getCurrentResultIndex();
-    return currentIndex >= 0 && currentIndex < results.length - 1;
+    return currentIndex >= 0 && currentIndex < sortedResults.length - 1;
   };
 
   const canNavigatePrevious = () => {
@@ -329,6 +330,28 @@ const ManageResults: React.FC = () => {
     }
     return '';
   };
+
+  const handleSortByPercentage = () => {
+    if (sortOrder === null || sortOrder === 'desc') {
+      setSortOrder('asc');
+    } else {
+      setSortOrder('desc');
+    }
+  };
+
+  const sortedResults = React.useMemo(() => {
+    if (sortOrder === null) {
+      return results;
+    }
+    const sorted = [...results].sort((a, b) => {
+      if (sortOrder === 'asc') {
+        return a.percentage - b.percentage;
+      } else {
+        return b.percentage - a.percentage;
+      }
+    });
+    return sorted;
+  }, [results, sortOrder]);
 
 
   return (
@@ -389,7 +412,17 @@ const ManageResults: React.FC = () => {
                   <th>{t('pages.results.srNo')}</th>
                   <th>{t('pages.results.studentName')}</th>
                   <th>{t('pages.results.standard')}</th>
-                  <th>{t('pages.results.percentage')}</th>
+                  <th 
+                    className={styles.sortableHeader}
+                    onClick={handleSortByPercentage}
+                  >
+                    {t('pages.results.percentage')}
+                    {sortOrder && (
+                      <span className={styles.sortIndicator}>
+                        {sortOrder === 'asc' ? '↑' : '↓'}
+                      </span>
+                    )}
+                  </th>
                   <th>{t('pages.results.village')}</th>
                   <th>{t('pages.results.contact')}</th>
                   <th>Approved</th>
@@ -398,14 +431,14 @@ const ManageResults: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {results.length === 0 ? (
+                {sortedResults.length === 0 ? (
                   <tr>
                     <td colSpan={9} className={styles.noData}>
                       {t('pages.results.noResults')}
                     </td>
                   </tr>
                 ) : (
-                  results.map((result, index) => (
+                  sortedResults.map((result, index) => (
                     <tr key={result._id}>
                       <td>{index + 1}</td>
                       <td>{result.studentName}</td>
@@ -460,7 +493,7 @@ const ManageResults: React.FC = () => {
               <div className={styles.modalHeader}>
                 <h2>{t('common.edit')}</h2>
                 <div className={styles.modalHeaderRight}>
-                  {results.length > 1 && (
+                  {sortedResults.length > 1 && (
                     <div className={styles.navigationButtons}>
                       <button
                         className={styles.navButton}
@@ -470,7 +503,7 @@ const ManageResults: React.FC = () => {
                         {t('common.previous')}
                       </button>
                       <span className={styles.navInfo}>
-                        {getCurrentResultIndex() + 1} / {results.length}
+                        {getCurrentResultIndex() + 1} / {sortedResults.length}
                       </span>
                       <button
                         className={styles.navButton}

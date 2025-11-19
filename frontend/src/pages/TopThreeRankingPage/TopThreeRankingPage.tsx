@@ -61,7 +61,14 @@ const TopThreeRankingPage: React.FC = () => {
   };
 
   const groupByStandard = (data: any[]) => {
-    if (!data || data.length === 0) return [];
+    if (!data || data.length === 0) {
+      // Return all standards with empty results
+      return standards.map((standard) => ({
+        standardId: standard._id,
+        standardName: standard.standardName,
+        results: [],
+      }));
+    }
     
     const grouped: { [key: string]: any } = {};
     
@@ -71,9 +78,10 @@ const TopThreeRankingPage: React.FC = () => {
       const standardName = group._id?.standardId?.standardName || group.standardName || 'Unknown';
       
       if (standardId) {
-        if (!grouped[standardId]) {
-          grouped[standardId] = {
-            standardId,
+        const standardIdStr = standardId.toString ? standardId.toString() : standardId;
+        if (!grouped[standardIdStr]) {
+          grouped[standardIdStr] = {
+            standardId: standardIdStr,
             standardName,
             results: [],
           };
@@ -81,13 +89,27 @@ const TopThreeRankingPage: React.FC = () => {
         
         // Add results from this group
         if (group.topThree && Array.isArray(group.topThree)) {
-          grouped[standardId].results = [...grouped[standardId].results, ...group.topThree];
+          grouped[standardIdStr].results = [...grouped[standardIdStr].results, ...group.topThree];
         }
       }
     });
     
+    // Ensure all standards are included, even if they have no results
+    const allStandardsMap = new Map(
+      standards.map((s) => [s._id.toString(), {
+        standardId: s._id.toString(),
+        standardName: s.standardName,
+        results: grouped[s._id.toString()]?.results || [],
+      }])
+    );
+    
+    // Merge with existing grouped data
+    Object.values(grouped).forEach((group: any) => {
+      allStandardsMap.set(group.standardId, group);
+    });
+    
     // Sort by standard display order
-    return Object.values(grouped).sort((a: any, b: any) => {
+    return Array.from(allStandardsMap.values()).sort((a: any, b: any) => {
       const standardA = standards.find((s) => s._id === a.standardId);
       const standardB = standards.find((s) => s._id === b.standardId);
       return (standardA?.displayOrder || 0) - (standardB?.displayOrder || 0);
@@ -194,8 +216,8 @@ const TopThreeRankingPage: React.FC = () => {
                     <tbody>
                       {group.results.length === 0 ? (
                         <tr>
-                          <td colSpan={isAdmin ? 6 : 5} className={styles.emptyCell}>
-                            {t('tables.noData')}
+                          <td colSpan={isAdmin ? 7 : 6} className={styles.emptyCell}>
+                            {t('tables.noRecords')}
                           </td>
                         </tr>
                       ) : (

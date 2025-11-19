@@ -169,7 +169,8 @@
   "tables": {
     "srNo": "Sr. No.",
     "actions": "Actions",
-    "noData": "No data available"
+    "noData": "No data available",
+    "noRecords": "No records available"
   }
 }
 

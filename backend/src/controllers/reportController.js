@@ -129,9 +129,42 @@ export const getTopThree = async (req, res, next) => {
       return orderA - orderB;
     });
 
+    // Get all school level standards to ensure we show all of them
+    const allSchoolStandards = await Standard.find({ isCollegeLevel: false })
+      .select('_id standardName standardCode displayOrder')
+      .sort({ displayOrder: 1 });
+
+    // Create a map of standards that have results
+    const standardsWithResults = new Map();
+    sortedResults.forEach((group) => {
+      const standardId = group._id.standardId?._id?.toString() || group._id.standardId?.toString();
+      if (standardId) {
+        standardsWithResults.set(standardId, group);
+      }
+    });
+
+    // Create final result with all standards, including empty ones
+    const finalResults = allSchoolStandards.map((standard) => {
+      const standardId = standard._id.toString();
+      const existingGroup = standardsWithResults.get(standardId);
+      
+      if (existingGroup) {
+        return existingGroup;
+      } else {
+        // Return empty group for standards with no results
+        return {
+          _id: {
+            standardId: standard,
+            medium: medium || null,
+          },
+          topThree: [],
+        };
+      }
+    });
+
     res.status(200).json({
       status: 'success',
-      data: sortedResults,
+      data: finalResults,
     });
   } catch (error) {
     next(error);

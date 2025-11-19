@@ -78,6 +78,24 @@
   font-size: 1rem;
 }
 
+.sortableHeader {
+  cursor: pointer;
+  user-select: none;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.sortableHeader:hover {
+  background-color: #e8e8e8;
+}
+
+.sortIndicator {
+  margin-left: 0.5rem;
+  font-size: 0.9rem;
+  color: #4caf50;
+  font-weight: bold;
+}
+
 .resultsTable td {
   padding: 0.35rem 0.75rem;
   border-bottom: 1px solid #e0e0e0;
