@@ -35,7 +35,8 @@
     "manageVillages": "Manage Villages",
     "manageStandards": "Standards",
     "manageResults": "Results",
-    "viewReports": "Reports"
+    "viewReports": "Reports",
+    "settings": "Settings"
   },
   "forms": {
     "studentName": "Student Full Name",
@@ -156,6 +157,12 @@
         "totalResults": "Total Results",
         "totalVillages": "Total Villages",
         "totalStandards": "Total Standards"
+      },
+      "settings": {
+        "title": "Settings",
+        "lastDateToUploadResult": "Last Upload Date",
+        "lastDateToUploadResultHelp": "Set the deadline for result uploads. Leave empty to allow uploads anytime.",
+        "saveSuccess": "Settings saved successfully"
       }
     }
   },
@@ -168,7 +175,8 @@
     "percentageRange": "Percentage must be between 0 and 100",
     "marksExceedTotal": "Obtained marks cannot exceed total marks",
     "resultImageRequired": "Result image is required",
-    "contactNumberRequired": "Contact number is required"
+    "contactNumberRequired": "Contact number is required",
+    "uploadDeadlinePassed": "The last date to upload results has passed. Please contact the administrator."
   },
   "tables": {
     "srNo": "Sr. No.",

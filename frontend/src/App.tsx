@@ -13,6 +13,7 @@ import ManageResults from './pages/ManageResults';
 import TopThreeRankingPage from './pages/TopThreeRankingPage';
 import ResultSuccessPage from './pages/ResultSuccessPage';
 import ViewResultsPage from './pages/ViewResultsPage';
+import SettingsPage from './pages/SettingsPage';
 import './App.css';
 
 const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) => {
@@ -76,6 +77,14 @@ function App() {
             element={
               <PrivateRoute>
                 <TopThreeRankingPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/admin/settings"
+            element={
+              <PrivateRoute>
+                <SettingsPage />
               </PrivateRoute>
             }
           />

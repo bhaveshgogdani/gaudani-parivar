@@ -48,6 +48,19 @@
   color: #4caf50;
 }
 
+.settingsLink {
+  font-size: 1.5rem;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s ease;
+}
+
+.settingsLink:hover {
+  transform: rotate(90deg);
+}
+
 .rightSection {
   display: flex;
   flex-direction: column;

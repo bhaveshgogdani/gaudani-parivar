@@ -35,7 +35,8 @@
     "manageVillages": "ગામોનું સંચાલન",
     "manageStandards": "ધોરણો",
     "manageResults": "રિજલ્ટ",
-    "viewReports": "રિપોર્ટ"
+    "viewReports": "રિપોર્ટ",
+    "settings": "સેટિંગ્સ"
   },
   "forms": {
     "studentName": "વિધાર્થી નું પૂરું નામ",
@@ -156,6 +157,12 @@
         "totalResults": "કુલ રિજલ્ટ",
         "totalVillages": "કુલ ગામો",
         "totalStandards": "કુલ ધોરણો"
+      },
+      "settings": {
+        "title": "સેટિંગ્સ",
+        "lastDateToUploadResult": "છેલ્લી અપલોડ તારીખ",
+        "lastDateToUploadResultHelp": "રિજલ્ટ અપલોડ માટે છેલ્લી તારીખ સેટ કરો. કોઈપણ સમયે અપલોડ મંજૂર કરવા માટે ખાલી છોડો.",
+        "saveSuccess": "સેટિંગ્સ સફળતાપૂર્વક સાચવ્યા"
       }
     }
   },
@@ -168,7 +175,8 @@
     "percentageRange": "ટકાવારી 0 અને 100 વચ્ચે હોવી જોઈએ",
     "marksExceedTotal": "મેળવેલ ગુણ કુલ ગુણ કરતાં વધુ ન હોઈ શકે",
     "resultImageRequired": "રિજલ્ટની છબી આવશ્યક છે",
-    "contactNumberRequired": "કોન્ટેક નંબર આવશ્યક છે"
+    "contactNumberRequired": "કોન્ટેક નંબર આવશ્યક છે",
+    "uploadDeadlinePassed": "રિજલ્ટ અપલોડ કરવાની છેલ્લી તારીખ પસાર થઈ ગઈ છે. કૃપા કરીને વ્યવસ્થાપકનો સંપર્ક કરો."
   },
   "tables": {
     "srNo": "ક્રમ",

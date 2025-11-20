@@ -8,6 +8,7 @@ import { useToast } from '../../context/ToastContext';
 import { resultApi } from '../../services/api/resultApi';
 import { villageApi } from '../../services/api/villageApi';
 import { standardApi } from '../../services/api/standardApi';
+import { adminApi } from '../../services/api/adminApi';
 import { Village, Standard, CreateResultData } from '../../types/result.types';
 import Layout from '../../components/layout/Layout';
 import Input from '../../components/common/Input/Input';
@@ -118,6 +119,23 @@ const UploadResultPage: React.FC = () => {
       showWarning(t('validation.resultImageRequired'));
       setIsLoading(false);
       return;
+    }
+    
+    // Check if upload deadline has passed
+    try {
+      const settings = await adminApi.getSettingsPublic();
+      if (settings.lastDateToUploadResult) {
+        const lastDate = new Date(settings.lastDateToUploadResult);
+        lastDate.setHours(23, 59, 59, 999); // End of the day
+        const now = new Date();
+        if (now > lastDate) {
+          showError(t('validation.uploadDeadlinePassed'));
+          return;
+        }
+      }
+    } catch (error) {
+      // If settings check fails, continue with upload (don't block if settings unavailable)
+      console.error('Error checking settings:', error);
     }
     
     setIsLoading(true);

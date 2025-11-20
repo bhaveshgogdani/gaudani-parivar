@@ -1,4 +1,5 @@
 import Result from '../models/Result.js';
+import Settings from '../models/Settings.js';
 import mongoose from 'mongoose';
 
 export const createResult = async (req, res, next) => {
@@ -13,6 +14,20 @@ export const createResult = async (req, res, next) => {
       villageId,
       contactNumber,
     } = req.body;
+
+    // Check if upload deadline has passed
+    const settings = await Settings.getSettings();
+    if (settings.lastDateToUploadResult) {
+      const lastDate = new Date(settings.lastDateToUploadResult);
+      lastDate.setHours(23, 59, 59, 999); // End of the day
+      const now = new Date();
+      if (now > lastDate) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'The last date to upload results has passed. Please contact the administrator.',
+        });
+      }
+    }
 
     // Validate required fields
     if (!contactNumber || !contactNumber.match(/^[0-9]{10}$/)) {

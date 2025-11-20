@@ -24,8 +24,11 @@ const TopThreeRankingPage: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadStandards();
-    loadTopThree();
+    const initialize = async () => {
+      await loadStandards();
+      await loadTopThree();
+    };
+    initialize();
   }, []);
 
   const loadStandards = async () => {
@@ -34,22 +37,27 @@ const TopThreeRankingPage: React.FC = () => {
       // Filter only school level standards
       const schoolStandards = data.filter((s) => !s.isCollegeLevel);
       setStandards(schoolStandards);
+      return schoolStandards;
     } catch (error) {
       console.error('Error loading standards:', error);
+      return [];
     }
   };
 
   const loadTopThree = async () => {
     setIsLoading(true);
     try {
+      // Ensure standards are loaded first
+      const currentStandards = standards.length > 0 ? standards : await loadStandards();
+      
       const [gujaratiData, englishData] = await Promise.all([
         reportApi.getTopThree(undefined, 'gujarati'),
         reportApi.getTopThree(undefined, 'english'),
       ]);
       
       // Group by standard
-      const gujaratiGrouped = groupByStandard(gujaratiData);
-      const englishGrouped = groupByStandard(englishData);
+      const gujaratiGrouped = groupByStandard(gujaratiData, currentStandards);
+      const englishGrouped = groupByStandard(englishData, currentStandards);
       
       setGujaratiResults(gujaratiGrouped);
       setEnglishResults(englishGrouped);
@@ -60,10 +68,10 @@ const TopThreeRankingPage: React.FC = () => {
     }
   };
 
-  const groupByStandard = (data: any[]) => {
+  const groupByStandard = (data: any[], currentStandards: Standard[] = standards) => {
     if (!data || data.length === 0) {
       // Return all standards with empty results
-      return standards.map((standard) => ({
+      return currentStandards.map((standard) => ({
         standardId: standard._id,
         standardName: standard.standardName,
         results: [],
@@ -96,7 +104,7 @@ const TopThreeRankingPage: React.FC = () => {
     
     // Ensure all standards are included, even if they have no results
     const allStandardsMap = new Map(
-      standards.map((s) => [s._id.toString(), {
+      currentStandards.map((s) => [s._id.toString(), {
         standardId: s._id.toString(),
         standardName: s.standardName,
         results: grouped[s._id.toString()]?.results || [],
@@ -110,8 +118,8 @@ const TopThreeRankingPage: React.FC = () => {
     
     // Sort by standard display order
     return Array.from(allStandardsMap.values()).sort((a: any, b: any) => {
-      const standardA = standards.find((s) => s._id === a.standardId);
-      const standardB = standards.find((s) => s._id === b.standardId);
+      const standardA = currentStandards.find((s) => s._id === a.standardId);
+      const standardB = currentStandards.find((s) => s._id === b.standardId);
       return (standardA?.displayOrder || 0) - (standardB?.displayOrder || 0);
     });
   };

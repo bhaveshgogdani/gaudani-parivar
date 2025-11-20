@@ -3,6 +3,7 @@ import jwt from 'jsonwebtoken';
 import Result from '../models/Result.js';
 import Village from '../models/Village.js';
 import Standard from '../models/Standard.js';
+import Settings from '../models/Settings.js';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -133,6 +134,43 @@ export const getDashboard = async (req, res, next) => {
         resultsByStandard,
         recentResults,
       },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getSettings = async (req, res, next) => {
+  try {
+    const settings = await Settings.getSettings();
+    res.status(200).json({
+      status: 'success',
+      data: settings,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const updateSettings = async (req, res, next) => {
+  try {
+    const { lastDateToUploadResult } = req.body;
+    
+    let settings = await Settings.findOne();
+    if (!settings) {
+      settings = await Settings.create({});
+    }
+    
+    if (lastDateToUploadResult !== undefined) {
+      settings.lastDateToUploadResult = lastDateToUploadResult ? new Date(lastDateToUploadResult) : null;
+    }
+    
+    await settings.save();
+    
+    res.status(200).json({
+      status: 'success',
+      message: 'Settings updated successfully',
+      data: settings,
     });
   } catch (error) {
     next(error);

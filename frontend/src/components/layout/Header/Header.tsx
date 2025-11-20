@@ -39,6 +39,9 @@ const Header: React.FC = () => {
               <Link to="/admin/manage-results">{t('navigation.manageResults')}</Link>
               <Link to="/admin/top-three">{t('navigation.topThree')}</Link>
               <Link to="/admin/view-reports">{t('navigation.viewReports')}</Link>
+              <Link to="/admin/settings" className={styles.settingsLink} title={t('navigation.settings')}>
+                ⚙️
+              </Link>
               <div className={styles.kuldevi}>
                 || કુળદેવી આઈ શ્રી ખોડીયાર માતાજી ||
               </div>
