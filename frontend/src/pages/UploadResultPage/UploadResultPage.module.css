@@ -178,22 +178,37 @@
   font-family: 'Noto Sans Gujarati', sans-serif;
 }
 
-@media (max-width: 768px) {
+/* Tablet styles (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
   .uploadPage {
-    padding: 1rem;
+    padding: 1.5rem 1rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+}
+
+/* Mobile styles (≤767px) */
+@media (max-width: 767px) {
+  .uploadPage {
+    padding: 0.8rem 0.4rem;
   }
 
   .headerRow {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    gap: 0.4rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
   }
 
   .homeButton {
-    padding: 0.5rem;
+    padding: 0.2rem;
     min-width: auto;
+    min-height: 44px;
+    flex-shrink: 0;
   }
 
   .homeIcon {
@@ -207,38 +222,135 @@
   .titleSection {
     flex: 1;
     min-width: 0;
+    order: 2;
+    width: 100%;
+    margin-top: 0.2rem;
   }
 
   .title {
-    font-size: 1.5rem;
+    font-size: 1rem;
     white-space: normal;
     word-break: break-word;
+    line-height: 1.3;
+    margin-bottom: 0.2rem;
   }
 
   .subtitle {
-    font-size: 0.875rem;
+    font-size: 0.46rem;
     white-space: normal;
     word-break: break-word;
+    line-height: 1.4;
   }
 
   .languageSwitcher {
     flex-shrink: 0;
+    order: 3;
+  }
+
+  .form {
+    padding: 1.2rem 0.8rem;
+    gap: 1rem;
+  }
+
+  .radioGroup {
+    gap: 0.6rem;
+  }
+
+  .radioOptions {
+    flex-direction: row;
+    gap: 1.2rem;
+    margin-top: 0.4rem;
+    flex-wrap: nowrap;
+  }
+
+  .radioOptions label {
+    font-size: 0.76rem;
+    padding: 0.4rem 0;
+    white-space: nowrap;
   }
 
   .marksSection {
     grid-template-columns: 1fr;
+    gap: 0.8rem;
+  }
+
+  .calculatedNote {
+    font-size: 0.64rem;
+    margin-top: -0.6rem;
   }
 
   .actions {
     flex-direction: column;
+    gap: 0.6rem;
+  }
+
+  .actions :global(.button) {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.7rem 1.2rem;
+    font-size: 0.8rem;
   }
 
   .uploadClosed {
-    padding: 2rem 1rem;
+    padding: 1.6rem 0.8rem;
+    margin: 0.8rem 0.6rem;
   }
 
   .uploadClosedTitle {
-    font-size: 1.6rem;
+    font-size: 1.2rem;
+    line-height: 1.3;
+    word-wrap: break-word;
+  }
+
+  .uploadClosedDescription {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+  }
+
+  .closedDate {
+    font-size: 0.76rem;
+    word-wrap: break-word;
+  }
+
+  .uploadClosed :global(.button) {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.7rem 1.2rem;
+    font-size: 0.8rem;
+  }
+
+  /* Ensure form inputs are full width and touch-friendly */
+  .form :global(.inputWrapper),
+  .form :global(.selectWrapper) {
+    width: 100%;
+    margin-bottom: 0;
+  }
+
+  .form :global(.input),
+  .form :global(.select) {
+    width: 100%;
+    min-height: 44px;
+    padding: 0.7rem;
+    font-size: 0.8rem;
+    box-sizing: border-box;
+  }
+
+  /* File upload area */
+  .form :global(.fileUpload) {
+    width: 100%;
+  }
+
+  /* Reduce label spacing */
+  .form :global(.inputWrapper),
+  .form :global(.selectWrapper),
+  .form :global(.fileUploadWrapper) {
+    gap: 0.4rem;
+  }
+
+  /* Reduce label font size */
+  .form :global(.label) {
+    font-size: 0.7rem;
   }
 }
 

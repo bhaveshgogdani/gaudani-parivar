@@ -286,7 +286,7 @@ const ManageResults: React.FC = () => {
       
       // If save and close, close the modal
       if (closeAfterSave) {
-        handleCloseModal();
+      handleCloseModal();
       } else {
         // If just save, find the updated result and keep modal open
         const updatedResult = updatedResults.find(r => r._id === selectedResult._id);
@@ -642,9 +642,9 @@ const ManageResults: React.FC = () => {
                       </button>
                     </div>
                   )}
-                  <button className={styles.closeButton} onClick={handleCloseModal}>
-                    ×
-                  </button>
+                <button className={styles.closeButton} onClick={handleCloseModal}>
+                  ×
+                </button>
                 </div>
               </div>
               <div className={styles.modalBody}>

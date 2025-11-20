@@ -160,9 +160,26 @@
   padding: 1rem 0;
 }
 
-@media (max-width: 768px) {
+/* Tablet styles (768px - 1023px) */
+@media (max-width: 1023px) and (min-width: 768px) {
+  .homePage {
+    padding: 1rem;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .countdownItem {
+    min-width: 80px;
+  }
+}
+
+/* Mobile styles (≤767px) */
+@media (max-width: 767px) {
   .homePage {
     padding: 0.75rem;
+    min-height: calc(100vh - 180px);
   }
 
   .headerSection {
@@ -171,29 +188,37 @@
 
   .title {
     font-size: 1.5rem;
+    line-height: 1.3;
+    word-wrap: break-word;
   }
 
   .kuldevi {
     font-size: 0.875rem;
+    word-wrap: break-word;
   }
 
   .welcome {
     font-size: 1rem;
+    word-wrap: break-word;
   }
 
   .instructionsSection {
     padding: 1rem;
     margin-bottom: 1rem;
+    border-radius: 6px;
   }
 
   .instructionsTitle {
-    font-size: 1.35rem;
+    font-size: 1.2rem;
     margin-bottom: 0.5rem;
+    line-height: 1.4;
   }
 
   .instructionsParagraph {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     line-height: 1.5;
+    word-wrap: break-word;
+    text-align: left;
   }
 
   .actionsSection {
@@ -201,23 +226,73 @@
     justify-content: center;
   }
 
-  .languageSwitcher {
-    position: absolute;
-    top: 0;
-    right: 0;
+  .deadlineCard {
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 8px;
   }
 
-  .countdown {
+  .deadlineHeader h3 {
+    font-size: 1.2rem;
+    line-height: 1.3;
+  }
+
+  .deadlineDate {
+    font-size: 0.95rem;
+    margin-top: 0.5rem;
+    word-wrap: break-word;
+  }
+
+  .deadlineDescription {
+    font-size: 0.9rem;
+    margin: 0.75rem auto 1rem;
+    line-height: 1.5;
+    word-wrap: break-word;
+  }
+
+  .countdownWrapper {
     gap: 0.5rem;
   }
 
+  .countdownLabel {
+    font-size: 0.75rem;
+  }
+
+  .countdown {
+    gap: 0.25rem;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+    width: 100%;
+  }
+
   .countdownItem {
-    min-width: 70px;
-    padding: 0.5rem;
+    min-width: 0;
+    padding: 0.4rem 0.25rem;
+    flex: 1 1 auto;
+    max-width: none;
   }
 
   .countdownItem span {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
+  }
+
+  .countdownItem small {
+    font-size: 0.6rem;
+  }
+
+  .deadlineExpired {
+    font-size: 1rem;
+    margin-top: 0.75rem;
+    word-wrap: break-word;
+  }
+
+  /* Ensure buttons are touch-friendly on mobile */
+  .actionsSection :global(.button) {
+    min-height: 44px;
+    width: 100%;
+    max-width: 100%;
+    padding: 0.875rem 1.5rem;
+    font-size: 1rem;
   }
 }
 
