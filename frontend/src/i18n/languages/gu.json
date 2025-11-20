@@ -108,13 +108,17 @@
       "filterByVillage": "ગામ પરિવાર",
       "filterByMedium": "માધ્યમ",
       "all": "બધા",
-      "printCollege": "Print Colleage",
+      "printCollege": "કોલેજ પ્રિન્ટ કરો",
       "srNo": "ક્રમ",
       "studentName": "વિધાર્થી નું પૂરું નામ",
       "standard": "વિધાર્થી નું ધોરણ",
       "percentage": "ટકાવારી",
       "village": "ગામ પરિવાર",
-      "contact": "કોન્ટેક નંબર"
+      "contact": "કોન્ટેક નંબર",
+      "collegeListByVillage": "કોલેજ યાદી ગામ પ્રમાણે",
+      "collegeList": "કોલેજ યાદી",
+      "schoolListByVillage": "ધોરણ યાદી ગામ પ્રમાણે",
+      "college": "કોલેજ"
     },
     "topThree": {
       "title": "એક થી ત્રણ નંબર નું લીસ્ટ",

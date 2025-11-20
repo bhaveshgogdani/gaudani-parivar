@@ -2,6 +2,10 @@ import express from 'express';
 import {
   getTopThree,
   exportTopThreePdf,
+  exportManageResultsPdf,
+  exportCollegeListByVillage,
+  exportSchoolListByVillage,
+  exportPrintCollege,
   getAwardsList,
   getSummary,
   exportReport,
@@ -26,6 +30,10 @@ router.get('/awards/first-rank', authMiddleware, getAwardsList);
 router.get('/awards/second-rank', authMiddleware, getAwardsList);
 router.get('/awards/export', authMiddleware, exportAwardsDocx);
 router.get('/top-three-pdf', authMiddleware, exportTopThreePdf);
+router.get('/manage-results-pdf', authMiddleware, exportManageResultsPdf);
+router.get('/college-list-by-village-pdf', authMiddleware, exportCollegeListByVillage);
+router.get('/school-list-by-village-pdf', authMiddleware, exportSchoolListByVillage);
+router.get('/print-college-pdf', authMiddleware, exportPrintCollege);
 router.get('/export', authMiddleware, exportReport);
 
 export default router;

@@ -180,13 +180,13 @@ const TopThreeRankingPage: React.FC = () => {
           </button>
         </div>
 
-        <div className={styles.actions}>
+          <div className={styles.actions}>
           <Button variant="primary" onClick={handleDownloadPdf}>
             {t('pages.topThree.downloadPdf')}
-          </Button>
+            </Button>
           <Button variant="secondary" onClick={handlePrint}>
             {t('common.print')}
-          </Button>
+            </Button>
         </div>
 
         {isLoading ? (
@@ -201,26 +201,26 @@ const TopThreeRankingPage: React.FC = () => {
                   <h2 className={styles.groupTitle}>
                     {group.standardName}
                   </h2>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
+          <table className={styles.table}>
+            <thead>
+              <tr>
                         <th>Rank</th>
-                        <th>{t('pages.results.studentName')}</th>
-                        <th>{t('pages.results.percentage')}</th>
-                        <th>{t('pages.results.village')}</th>
-                        <th>{t('pages.results.contact')}</th>
+                <th>{t('pages.results.studentName')}</th>
+                <th>{t('pages.results.percentage')}</th>
+                <th>{t('pages.results.village')}</th>
+                <th>{t('pages.results.contact')}</th>
                         <th>{t('common.view')}</th>
-                        {isAdmin && <th>{t('common.actions')}</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
+                {isAdmin && <th>{t('common.actions')}</th>}
+              </tr>
+            </thead>
+            <tbody>
                       {group.results.length === 0 ? (
-                        <tr>
-                          <td colSpan={isAdmin ? 7 : 6} className={styles.emptyCell}>
+                <tr>
+                  <td colSpan={isAdmin ? 7 : 6} className={styles.emptyCell}>
                             {t('tables.noRecords')}
-                          </td>
-                        </tr>
-                      ) : (
+                  </td>
+                </tr>
+              ) : (
                         group.results.map((result: any) => {
                           // Handle village name - could be object or string
                           const villageName =
@@ -231,12 +231,12 @@ const TopThreeRankingPage: React.FC = () => {
                           const imageUrl = getImageUrl(result);
 
                           return (
-                            <tr key={result._id}>
+                    <tr key={result._id}>
                               <td>{result.rank || '-'}</td>
-                              <td>{result.studentName}</td>
-                              <td>{result.percentage.toFixed(2)}%</td>
+                      <td>{result.studentName}</td>
+                      <td>{result.percentage.toFixed(2)}%</td>
                               <td>{villageName || '-'}</td>
-                              <td>{result.contactNumber || '-'}</td>
+                      <td>{result.contactNumber || '-'}</td>
                               <td>
                                 {imageUrl ? (
                                   <img
@@ -249,8 +249,8 @@ const TopThreeRankingPage: React.FC = () => {
                                   '-'
                                 )}
                               </td>
-                              {isAdmin && (
-                                <td>
+                      {isAdmin && (
+                        <td>
                                   <div className={styles.rowActions}>
                                     <Button
                                       variant="primary"
@@ -259,23 +259,23 @@ const TopThreeRankingPage: React.FC = () => {
                                     >
                                       {t('common.edit')}
                                     </Button>
-                                    <Button
-                                      variant="danger"
-                                      size="small"
-                                      onClick={() => handleDelete(result._id)}
-                                    >
-                                      {t('common.delete')}
-                                    </Button>
+                          <Button
+                            variant="danger"
+                            size="small"
+                            onClick={() => handleDelete(result._id)}
+                          >
+                            {t('common.delete')}
+                          </Button>
                                   </div>
-                                </td>
-                              )}
-                            </tr>
+                        </td>
+                      )}
+                    </tr>
                           );
                         })
-                      )}
-                    </tbody>
-                  </table>
-                </div>
+              )}
+            </tbody>
+          </table>
+        </div>
               ))
             )}
           </div>

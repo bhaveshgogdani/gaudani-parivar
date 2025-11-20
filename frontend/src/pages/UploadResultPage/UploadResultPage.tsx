@@ -157,6 +157,16 @@ const UploadResultPage: React.FC = () => {
             error={errors.studentName?.message}
           />
 
+          <Select
+            label={<>{t('forms.standard')} <span className={styles.requiredAsterisk}>*</span></>}
+            options={standards.map((s) => ({
+              value: s._id,
+              label: s.standardName,
+            }))}
+            {...register('standardId')}
+            error={errors.standardId?.message}
+          />
+
           <div className={styles.radioGroup}>
             <label>{t('forms.medium')} <span className={styles.requiredAsterisk}>*</span></label>
             <div className={styles.radioOptions}>
@@ -179,16 +189,6 @@ const UploadResultPage: React.FC = () => {
             </div>
             {errors.medium && <span className={styles.error}>{errors.medium.message}</span>}
           </div>
-
-          <Select
-            label={<>{t('forms.standard')} <span className={styles.requiredAsterisk}>*</span></>}
-            options={standards.map((s) => ({
-              value: s._id,
-              label: s.standardName,
-            }))}
-            {...register('standardId')}
-            error={errors.standardId?.message}
-          />
 
           <div className={styles.marksSection}>
             <Input

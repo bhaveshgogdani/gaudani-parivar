@@ -114,7 +114,11 @@
       "standard": "Student Standard",
       "percentage": "Percentage",
       "village": "Village Family",
-      "contact": "Contact Number"
+      "contact": "Contact Number",
+      "collegeListByVillage": "College List by Village",
+      "collegeList": "College List",
+      "schoolListByVillage": "Standard List by Village",
+      "college": "College"
     },
     "topThree": {
       "title": "Top 3 List",

@@ -483,6 +483,829 @@ export const exportTopThreePdf = async (req, res, next) => {
   }
 };
 
+export const exportManageResultsPdf = async (req, res, next) => {
+  try {
+    const { medium, standardId, villageId } = req.query;
+
+    // Build match query
+    const matchQuery = {};
+    
+    if (medium && (medium === 'gujarati' || medium === 'english')) {
+      matchQuery.medium = medium;
+    }
+
+    // Get all standards to filter by college level
+    const allStandards = await Standard.find().select('_id isCollegeLevel').lean();
+    const collegeStandardIds = allStandards.filter(s => s.isCollegeLevel).map(s => s._id);
+    const schoolStandardIds = allStandards.filter(s => !s.isCollegeLevel).map(s => s._id);
+
+    // Handle standardId filter
+    if (standardId && mongoose.Types.ObjectId.isValid(standardId)) {
+      matchQuery.standardId = new mongoose.Types.ObjectId(standardId);
+    } else {
+      // If medium is provided, exclude college level (school level only)
+      // If medium is not provided, include only college level
+      if (medium && (medium === 'gujarati' || medium === 'english')) {
+        matchQuery.standardId = { $in: schoolStandardIds };
+      } else if (!medium) {
+        // No medium means college tab - only college level
+        matchQuery.standardId = { $in: collegeStandardIds };
+      }
+    }
+
+    if (villageId && mongoose.Types.ObjectId.isValid(villageId)) {
+      matchQuery.villageId = new mongoose.Types.ObjectId(villageId);
+    }
+
+    // Get village name if villageId is provided
+    let villageName = null;
+    if (villageId && mongoose.Types.ObjectId.isValid(villageId)) {
+      const village = await Village.findById(villageId).select('villageName').lean();
+      if (village) {
+        villageName = village.villageName;
+      }
+    }
+
+    // Get results with filters
+    const results = await Result.find(matchQuery)
+      .populate('standardId', 'standardName standardCode displayOrder isCollegeLevel')
+      .populate('villageId', 'villageName')
+      .sort({ percentage: -1, submittedAt: 1 })
+      .lean();
+
+    // Font detection and setup (same as exportTopThreePdf)
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const fontsDir = path.join(__dirname, '../../fonts');
+
+    let defaultFont = 'Roboto';
+    const fonts = {
+      Roboto: {
+        normal: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Regular.ttf'),
+        bold: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Medium.ttf'),
+        italics: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Italic.ttf'),
+        bolditalics: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-MediumItalic.ttf'),
+      },
+    };
+
+    // Check for Gujarati fonts
+    const fontFiles = {
+      'NirmalaUI-01.ttf': { name: 'NirmalaUI', variant: 'normal' },
+      'NirmalaUI-Bold-02.ttf': { name: 'NirmalaUI', variant: 'bold' },
+      'NotoSansGujarati-Regular.ttf': { name: 'NotoSansGujarati', variant: 'normal' },
+      'NotoSansGujarati-Bold.ttf': { name: 'NotoSansGujarati', variant: 'bold' },
+    };
+
+    let gujaratiFontName = null;
+    for (const [filename, config] of Object.entries(fontFiles)) {
+      const fontPath = path.join(fontsDir, filename);
+      if (fs.existsSync(fontPath)) {
+        if (!gujaratiFontName) {
+          gujaratiFontName = config.name;
+        }
+        if (!fonts[config.name]) {
+          fonts[config.name] = {};
+        }
+        fonts[config.name][config.variant] = fontPath;
+      }
+    }
+
+    // Set default font
+    if (gujaratiFontName) {
+      defaultFont = gujaratiFontName;
+      // Ensure all variants are set
+      if (!fonts[gujaratiFontName].normal) fonts[gujaratiFontName].normal = fonts[gujaratiFontName].bold || fonts.Roboto.normal;
+      if (!fonts[gujaratiFontName].bold) fonts[gujaratiFontName].bold = fonts[gujaratiFontName].normal || fonts.Roboto.bold;
+      if (!fonts[gujaratiFontName].italics) fonts[gujaratiFontName].italics = fonts[gujaratiFontName].normal || fonts.Roboto.italics;
+      if (!fonts[gujaratiFontName].bolditalics) fonts[gujaratiFontName].bolditalics = fonts[gujaratiFontName].bold || fonts.Roboto.bolditalics;
+    }
+
+    const printer = new PdfPrinter(fonts);
+
+    // Build table
+    const tableBody = [
+      // Header row
+      [
+        { text: 'ક્રમ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        { text: 'વિધાર્થી નું નામ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        { text: 'ધોરણ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        { text: 'ટકાવારી', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        { text: 'ગામ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        { text: 'નોંધ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+      ],
+    ];
+
+    // Add data rows
+    results.forEach((result, index) => {
+      const rowColor = '#FFFFFF';
+      tableBody.push([
+        { text: String(index + 1), style: 'tableCell', alignment: 'center', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        { text: result.studentName || '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        { text: result.standardId?.standardName || '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        { text: `${result.percentage.toFixed(2)}%`, style: 'tableCellBold', alignment: 'center', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        { text: result.villageId?.villageName || '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        { text: '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+      ]);
+    });
+
+    // Build document content
+    const content = [];
+
+    // Add main title
+    content.push({
+      text: 'ગૌદાની પરિવાર સ્નેહમિલન સમારોહ - ' + (new Date().getFullYear() + 1),
+      style: 'mainTitle',
+      alignment: 'center',
+      margin: [0, 0, 0, 2],
+    });
+
+    // Add village name if village filter is selected
+    if (villageName) {
+      content.push({
+        text: villageName,
+        style: 'villageTitle',
+        alignment: 'center',
+        margin: [0, 0, 0, 5],
+      });
+    }
+
+    // Add spacing before table
+    content.push({ text: '', margin: [0, 5] });
+
+    // Add table
+    content.push({
+      table: {
+        headerRows: 1,
+        widths: ['6%', '28%', '11%', '10%', '12%', '33%'],
+        body: tableBody,
+      },
+      layout: {
+        paddingTop: () => 8,
+        paddingBottom: () => 8,
+        hLineWidth: (i, node) => (i === 0 || i === node.table.body.length ? 1 : 0.5),
+        vLineWidth: () => 0.5,
+        hLineColor: () => '#c9c9c9',
+        vLineColor: () => '#c9c9c9',
+        fillColor: (rowIndex) => {
+          if (rowIndex === 0) return '#E8E8E8';
+          return '#FFFFFF';
+        },
+      },
+    });
+
+    // Build document
+    const docDefinition = {
+      pageSize: 'A4',
+      pageMargins: [40, 40, 40, 40],
+      defaultStyle: {
+        font: defaultFont,
+        fontSize: 11,
+      },
+      styles: {
+        mainTitle: {
+          fontSize: 20,
+          bold: true,
+          font: defaultFont,
+          margin: [0, 0, 0, 2],
+        },
+        villageTitle: {
+          fontSize: 16,
+          bold: true,
+          font: defaultFont,
+          margin: [0, 0, 0, 5],
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 12,
+          color: 'black',
+          fillColor: '#E8E8E8',
+          font: defaultFont,
+          margin: [0, 5],
+        },
+        tableCell: {
+          fontSize: 11,
+          font: defaultFont,
+        },
+        tableCellBold: {
+          fontSize: 11,
+          bold: true,
+          font: defaultFont,
+        },
+      },
+      content: content,
+    };
+
+    // Generate PDF
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=results.pdf');
+    
+    pdfDoc.pipe(res);
+    pdfDoc.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const exportCollegeListByVillage = async (req, res, next) => {
+  try {
+    const { medium } = req.query;
+
+    // Build match query for college level results only
+    const matchQuery = {
+      isApproved: true,
+    };
+    
+    if (medium && (medium === 'gujarati' || medium === 'english')) {
+      matchQuery.medium = medium;
+    }
+
+    // Get all college level standards
+    const collegeStandards = await Standard.find({ isCollegeLevel: true }).select('_id');
+    const collegeStandardIds = collegeStandards.map(s => s._id);
+
+    if (collegeStandardIds.length === 0) {
+      return res.status(404).json({ status: 'error', message: 'No college level standards found' });
+    }
+
+    matchQuery.standardId = { $in: collegeStandardIds };
+
+    // Get results grouped by village
+    const results = await Result.find(matchQuery)
+      .populate('standardId', 'standardName standardCode displayOrder isCollegeLevel')
+      .populate('villageId', 'villageName')
+      .sort({ 'villageId.villageName': 1, percentage: -1, submittedAt: 1 })
+      .lean();
+
+    // Group results by village
+    const villageGroups = {};
+    results.forEach((result) => {
+      const villageId = result.villageId?._id?.toString() || result.villageId?.toString();
+      const villageName = result.villageId?.villageName || 'Unknown';
+      
+      if (!villageGroups[villageId]) {
+        villageGroups[villageId] = {
+          villageId,
+          villageName,
+          results: [],
+        };
+      }
+      villageGroups[villageId].results.push(result);
+    });
+
+    // Font detection and setup
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const fontsDir = path.join(__dirname, '../../fonts');
+
+    let defaultFont = 'Roboto';
+    const fonts = {
+      Roboto: {
+        normal: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Regular.ttf'),
+        bold: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Medium.ttf'),
+        italics: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Italic.ttf'),
+        bolditalics: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-MediumItalic.ttf'),
+      },
+    };
+
+    // Check for Gujarati fonts
+    const fontFiles = {
+      'NirmalaUI-01.ttf': { name: 'NirmalaUI', variant: 'normal' },
+      'NirmalaUI-Bold-02.ttf': { name: 'NirmalaUI', variant: 'bold' },
+      'NotoSansGujarati-Regular.ttf': { name: 'NotoSansGujarati', variant: 'normal' },
+      'NotoSansGujarati-Bold.ttf': { name: 'NotoSansGujarati', variant: 'bold' },
+    };
+
+    let gujaratiFontName = null;
+    for (const [filename, config] of Object.entries(fontFiles)) {
+      const fontPath = path.join(fontsDir, filename);
+      if (fs.existsSync(fontPath)) {
+        if (!gujaratiFontName) {
+          gujaratiFontName = config.name;
+        }
+        if (!fonts[config.name]) {
+          fonts[config.name] = {};
+        }
+        fonts[config.name][config.variant] = fontPath;
+      }
+    }
+
+    // Set default font
+    if (gujaratiFontName) {
+      defaultFont = gujaratiFontName;
+      // Ensure all variants are set
+      if (!fonts[gujaratiFontName].normal) fonts[gujaratiFontName].normal = fonts[gujaratiFontName].bold || fonts.Roboto.normal;
+      if (!fonts[gujaratiFontName].bold) fonts[gujaratiFontName].bold = fonts[gujaratiFontName].normal || fonts.Roboto.bold;
+      if (!fonts[gujaratiFontName].italics) fonts[gujaratiFontName].italics = fonts[gujaratiFontName].normal || fonts.Roboto.italics;
+      if (!fonts[gujaratiFontName].bolditalics) fonts[gujaratiFontName].bolditalics = fonts[gujaratiFontName].bold || fonts.Roboto.bolditalics;
+    }
+
+    const printer = new PdfPrinter(fonts);
+
+    // Helper function to create village page
+    const createVillagePage = (villageData, isFirstPage) => {
+      const tableBody = [
+        // Header row
+        [
+          { text: 'ક્રમ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+          { text: 'વિધાર્થી નું નામ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+          { text: 'ધોરણ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+          { text: 'ટકાવારી', style: 'tableHeader', alignment: 'center', font: defaultFont },
+          { text: 'નોંધ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        ],
+      ];
+
+      // Add data rows
+      villageData.results.forEach((result, index) => {
+        const rowColor = '#FFFFFF';
+        tableBody.push([
+          { text: String(index + 1), style: 'tableCell', alignment: 'center', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+          { text: result.studentName || '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+          { text: result.standardId?.standardName || '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+          { text: `${result.percentage.toFixed(2)}%`, style: 'tableCellBold', alignment: 'center', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+          { text: '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        ]);
+      });
+
+      return {
+        stack: [
+          { text: 'ગૌદાની પરિવાર સ્નેહમિલન સમારોહ - ' + (new Date().getFullYear() + 1), style: 'mainTitle', alignment: 'center' },
+          { text: villageData.villageName, style: 'villageTitle', alignment: 'center' },
+          { text: '', margin: [0, 5] },
+          {
+            table: {
+              headerRows: 1,
+              widths: ['8%', '35%', '20%', '12%', '25%'],
+              body: tableBody,
+            },
+            layout: {
+              paddingTop: () => 8,
+              paddingBottom: () => 8,
+              hLineWidth: (i, node) => (i === 0 || i === node.table.body.length ? 1 : 0.5),
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#c9c9c9',
+              vLineColor: () => '#c9c9c9',
+              fillColor: (rowIndex) => {
+                if (rowIndex === 0) return '#E8E8E8';
+                return '#FFFFFF';
+              },
+            },
+          },
+        ],
+        pageBreak: isFirstPage ? undefined : 'before',
+      };
+    };
+
+    // Build document content
+    const content = [];
+    const villageArray = Object.values(villageGroups);
+    
+    villageArray.forEach((villageData, index) => {
+      content.push(createVillagePage(villageData, index === 0));
+    });
+
+    // Build document
+    const docDefinition = {
+      pageSize: 'A4',
+      pageMargins: [40, 40, 40, 40],
+      defaultStyle: {
+        font: defaultFont,
+        fontSize: 11,
+      },
+      styles: {
+        mainTitle: {
+          fontSize: 20,
+          bold: true,
+          font: defaultFont,
+          margin: [0, 0, 0, 2],
+        },
+        villageTitle: {
+          fontSize: 16,
+          bold: true,
+          font: defaultFont,
+          margin: [0, 0, 0, 5],
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 12,
+          color: 'black',
+          fillColor: '#E8E8E8',
+          font: defaultFont,
+          margin: [0, 5],
+        },
+        tableCell: {
+          fontSize: 11,
+          font: defaultFont,
+        },
+        tableCellBold: {
+          fontSize: 11,
+          bold: true,
+          font: defaultFont,
+        },
+      },
+      content: content,
+    };
+
+    // Generate PDF
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=college-list-by-village.pdf');
+    
+    pdfDoc.pipe(res);
+    pdfDoc.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const exportSchoolListByVillage = async (req, res, next) => {
+  try {
+    // Build match query for school level results only
+    const matchQuery = {
+      isApproved: true,
+    };
+
+    // Get all school level standards (isCollegeLevel: false)
+    const schoolStandards = await Standard.find({ isCollegeLevel: false }).select('_id');
+    const schoolStandardIds = schoolStandards.map((s) => s._id);
+
+    if (schoolStandardIds.length === 0) {
+      return res.status(404).json({ status: 'error', message: 'No school level standards found' });
+    }
+
+    matchQuery.standardId = { $in: schoolStandardIds };
+
+    // Get results grouped by village
+    const results = await Result.find(matchQuery)
+      .populate('standardId', 'standardName standardCode displayOrder isCollegeLevel')
+      .populate('villageId', 'villageName')
+      .sort({ 'villageId.villageName': 1, 'standardId.displayOrder': 1 })
+      .lean();
+
+    // Group results by village
+    const villageGroups = {};
+    results.forEach((result) => {
+      const villageId = result.villageId?._id?.toString() || result.villageId?.toString() || 'unknown';
+      const villageName = result.villageId?.villageName || 'Unknown';
+
+      if (!villageGroups[villageId]) {
+        villageGroups[villageId] = {
+          villageId,
+          villageName,
+          results: [],
+        };
+      }
+      villageGroups[villageId].results.push(result);
+    });
+
+    // Font detection and setup
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const fontsDir = path.join(__dirname, '../../fonts');
+
+    let defaultFont = 'Roboto';
+    const fonts = {
+      Roboto: {
+        normal: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Regular.ttf'),
+        bold: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Medium.ttf'),
+        italics: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Italic.ttf'),
+        bolditalics: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-MediumItalic.ttf'),
+      },
+    };
+
+    // Check for Gujarati fonts
+    const fontFiles = {
+      'NirmalaUI-01.ttf': { name: 'NirmalaUI', variant: 'normal' },
+      'NirmalaUI-Bold-02.ttf': { name: 'NirmalaUI', variant: 'bold' },
+      'NotoSansGujarati-Regular.ttf': { name: 'NotoSansGujarati', variant: 'normal' },
+      'NotoSansGujarati-Bold.ttf': { name: 'NotoSansGujarati', variant: 'bold' },
+    };
+
+    let gujaratiFontName = null;
+    for (const [filename, config] of Object.entries(fontFiles)) {
+      const fontPath = path.join(fontsDir, filename);
+      if (fs.existsSync(fontPath)) {
+        if (!gujaratiFontName) {
+          gujaratiFontName = config.name;
+        }
+        if (!fonts[config.name]) {
+          fonts[config.name] = {};
+        }
+        fonts[config.name][config.variant] = fontPath;
+      }
+    }
+
+    // Set default font
+    if (gujaratiFontName) {
+      defaultFont = gujaratiFontName;
+      if (!fonts[gujaratiFontName].normal) fonts[gujaratiFontName].normal = fonts[gujaratiFontName].bold || fonts.Roboto.normal;
+      if (!fonts[gujaratiFontName].bold) fonts[gujaratiFontName].bold = fonts[gujaratiFontName].normal || fonts.Roboto.bold;
+      if (!fonts[gujaratiFontName].italics) fonts[gujaratiFontName].italics = fonts[gujaratiFontName].normal || fonts.Roboto.italics;
+      if (!fonts[gujaratiFontName].bolditalics) fonts[gujaratiFontName].bolditalics = fonts[gujaratiFontName].bold || fonts.Roboto.bolditalics;
+    }
+
+    const printer = new PdfPrinter(fonts);
+
+    const createVillagePage = (villageData, isFirstPage) => {
+      const tableBody = [
+        [
+          { text: 'ક્રમ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+          { text: 'વિધાર્થી નું નામ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+          { text: 'ધોરણ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+          { text: 'ટકાવારી', style: 'tableHeader', alignment: 'center', font: defaultFont },
+          { text: 'માધ્યમ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+          { text: 'નોંધ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        ],
+      ];
+
+      villageData.results.forEach((result, index) => {
+        tableBody.push([
+          { text: String(index + 1), style: 'tableCell', alignment: 'center', font: defaultFont, margin: [0, 5] },
+          { text: result.studentName || '', style: 'tableCell', font: defaultFont, margin: [0, 5] },
+          { text: result.standardId?.standardName || '', style: 'tableCell', font: defaultFont, margin: [0, 5] },
+          { text: `${result.percentage.toFixed(2)}%`, style: 'tableCellBold', alignment: 'center', font: defaultFont, margin: [0, 5] },
+          { text: (result.medium == 'gujarati' ? 'ગુજરાતી' : 'ઇંગ્લીશી') || '', style: 'tableCell', font: defaultFont, margin: [0, 5] },
+          { text: '', style: 'tableCell', font: defaultFont, margin: [0, 5] },
+        ]);
+      });
+
+      return {
+        stack: [
+          { text: 'ગૌદાની પરિવાર સ્નેહમિલન સમારોહ - ' + (new Date().getFullYear() + 1), style: 'mainTitle', alignment: 'center' },
+          { text: villageData.villageName, style: 'villageTitle', alignment: 'center' },
+          { text: '', margin: [0, 5] },
+          {
+            table: {
+              headerRows: 1,
+              widths: ['8%', '26%', '14%', '12%', '12%', '28%'],
+              body: tableBody,
+            },
+            layout: {
+              paddingTop: () => 1,
+              paddingBottom: () => 1,
+              hLineWidth: (i, node) => (i === 0 || i === node.table.body.length ? 1 : 0.5),
+              vLineWidth: () => 0.5,
+              hLineColor: () => '#c9c9c9',
+              vLineColor: () => '#c9c9c9',
+              fillColor: (rowIndex) => {
+                if (rowIndex === 0) return '#E8E8E8';
+                return '#FFFFFF';
+              },
+            },
+          },
+        ],
+        pageBreak: isFirstPage ? undefined : 'before',
+      };
+    };
+
+    const content = [];
+    const villageArray = Object.values(villageGroups);
+    villageArray.forEach((villageData, index) => {
+      content.push(createVillagePage(villageData, index === 0));
+    });
+
+    const docDefinition = {
+      pageSize: 'A4',
+      pageMargins: [40, 40, 40, 40],
+      defaultStyle: {
+        font: defaultFont,
+        fontSize: 11,
+      },
+      styles: {
+        mainTitle: {
+          fontSize: 20,
+          bold: true,
+          font: defaultFont,
+          margin: [0, 0, 0, 2],
+        },
+        villageTitle: {
+          fontSize: 16,
+          bold: true,
+          font: defaultFont,
+          margin: [0, 0, 0, 5],
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 12,
+          color: 'black',
+          fillColor: '#E8E8E8',
+          font: defaultFont,
+          margin: [0, 5],
+        },
+        tableCell: {
+          fontSize: 11,
+          font: defaultFont,
+        },
+        tableCellBold: {
+          fontSize: 11,
+          bold: true,
+          font: defaultFont,
+        },
+      },
+      content,
+    };
+
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=school-list-by-village.pdf');
+
+    pdfDoc.pipe(res);
+    pdfDoc.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const exportPrintCollege = async (req, res, next) => {
+  try {
+    // Build match query for college level results only
+    const matchQuery = {};
+
+    // Get all college level standards
+    const collegeStandards = await Standard.find({ isCollegeLevel: true }).select('_id');
+    const collegeStandardIds = collegeStandards.map(s => s._id);
+
+    if (collegeStandardIds.length === 0) {
+      return res.status(404).json({ status: 'error', message: 'No college level standards found' });
+    }
+
+    matchQuery.standardId = { $in: collegeStandardIds };
+
+    // Get all college results, sorted by percentage
+    const results = await Result.find(matchQuery)
+      .populate('standardId', 'standardName standardCode displayOrder isCollegeLevel')
+      .populate('villageId', 'villageName')
+      .sort({ percentage: -1, submittedAt: 1 })
+      .lean();
+
+    // Font detection and setup (same as exportManageResultsPdf)
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
+    const fontsDir = path.join(__dirname, '../../fonts');
+
+    let defaultFont = 'Roboto';
+    const fonts = {
+      Roboto: {
+        normal: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Regular.ttf'),
+        bold: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Medium.ttf'),
+        italics: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-Italic.ttf'),
+        bolditalics: path.join(__dirname, '../../node_modules/pdfmake/fonts/Roboto-MediumItalic.ttf'),
+      },
+    };
+
+    // Check for Gujarati fonts
+    const fontFiles = {
+      'NirmalaUI-01.ttf': { name: 'NirmalaUI', variant: 'normal' },
+      'NirmalaUI-Bold-02.ttf': { name: 'NirmalaUI', variant: 'bold' },
+      'NotoSansGujarati-Regular.ttf': { name: 'NotoSansGujarati', variant: 'normal' },
+      'NotoSansGujarati-Bold.ttf': { name: 'NotoSansGujarati', variant: 'bold' },
+    };
+
+    let gujaratiFontName = null;
+    for (const [filename, config] of Object.entries(fontFiles)) {
+      const fontPath = path.join(fontsDir, filename);
+      if (fs.existsSync(fontPath)) {
+        if (!gujaratiFontName) {
+          gujaratiFontName = config.name;
+        }
+        if (!fonts[config.name]) {
+          fonts[config.name] = {};
+        }
+        fonts[config.name][config.variant] = fontPath;
+      }
+    }
+
+    // Set default font
+    if (gujaratiFontName) {
+      defaultFont = gujaratiFontName;
+      // Ensure all variants are set
+      if (!fonts[gujaratiFontName].normal) fonts[gujaratiFontName].normal = fonts[gujaratiFontName].bold || fonts.Roboto.normal;
+      if (!fonts[gujaratiFontName].bold) fonts[gujaratiFontName].bold = fonts[gujaratiFontName].normal || fonts.Roboto.bold;
+      if (!fonts[gujaratiFontName].italics) fonts[gujaratiFontName].italics = fonts[gujaratiFontName].normal || fonts.Roboto.italics;
+      if (!fonts[gujaratiFontName].bolditalics) fonts[gujaratiFontName].bolditalics = fonts[gujaratiFontName].bold || fonts.Roboto.bolditalics;
+    }
+
+    const printer = new PdfPrinter(fonts);
+
+    // Build table
+    const tableBody = [
+      // Header row
+      [
+        { text: 'ક્રમ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        { text: 'વિધાર્થી નું નામ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        { text: 'ધોરણ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        { text: 'ટકાવારી', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        { text: 'ગામ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+        { text: 'નોંધ', style: 'tableHeader', alignment: 'center', font: defaultFont },
+      ],
+    ];
+
+    // Add data rows
+    results.forEach((result, index) => {
+      const rowColor = '#FFFFFF';
+      tableBody.push([
+        { text: String(index + 1), style: 'tableCell', alignment: 'center', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        { text: result.studentName || '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        { text: result.standardId?.standardName || '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        { text: `${result.percentage.toFixed(2)}%`, style: 'tableCellBold', alignment: 'center', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        { text: result.villageId?.villageName || '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+        { text: '', style: 'tableCell', fillColor: rowColor, font: defaultFont, margin: [0, 5] },
+      ]);
+    });
+
+    // Build document content
+    const content = [];
+
+    // Add main title
+    content.push({
+      text: 'ગૌદાની પરિવાર સ્નેહમિલન સમારોહ - ' + (new Date().getFullYear() + 1),
+      style: 'mainTitle',
+      alignment: 'center',
+      margin: [0, 0, 0, 2],
+    });
+    content.push({
+      text: 'કોલેજ ના તેજસ્વી તારલાઓ',
+      style: 'subtitle',
+      alignment: 'center',
+      margin: [0, 0, 0, 2],
+    });
+
+    // Add spacing before table
+    content.push({ text: '', margin: [0, 5] });
+
+    // Add table
+    content.push({
+      table: {
+        headerRows: 1,
+        widths: ['6%', '28%', '11%', '12%', '12%', '31%'],
+        body: tableBody,
+      },
+      layout: {
+        paddingTop: () => 1,
+        paddingBottom: () => 1,
+        hLineWidth: (i, node) => (i === 0 || i === node.table.body.length ? 1 : 0.5),
+        vLineWidth: () => 0.5,
+        hLineColor: () => '#c9c9c9',
+        vLineColor: () => '#c9c9c9',
+        fillColor: (rowIndex) => {
+          if (rowIndex === 0) return '#E8E8E8';
+          return '#FFFFFF';
+        },
+      },
+    });
+
+    // Build document
+    const docDefinition = {
+      pageSize: 'A4',
+      pageMargins: [40, 40, 40, 40],
+      defaultStyle: {
+        font: defaultFont,
+        fontSize: 11,
+      },
+      styles: {
+        mainTitle: {
+          fontSize: 20,
+          bold: true,
+          font: defaultFont,
+          margin: [0, 0, 0, 2],
+        },
+        tableHeader: {
+          bold: true,
+          fontSize: 12,
+          color: 'black',
+          fillColor: '#E8E8E8',
+          font: defaultFont,
+          margin: [0, 5],
+        },
+        tableCell: {
+          fontSize: 11,
+          font: defaultFont,
+        },
+        tableCellBold: {
+          fontSize: 11,
+          bold: true,
+          font: defaultFont,
+        },
+      },
+      content: content,
+    };
+
+    // Generate PDF
+    const pdfDoc = printer.createPdfKitDocument(docDefinition);
+    
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=print-college.pdf');
+    
+    pdfDoc.pipe(res);
+    pdfDoc.end();
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const getAwardsList = async (req, res, next) => {
   try {
     const { rank, standardId, medium } = req.query;

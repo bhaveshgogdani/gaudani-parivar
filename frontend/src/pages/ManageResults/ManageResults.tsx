@@ -15,6 +15,8 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import styles from './ManageResults.module.css';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { saveAs } from 'file-saver';
+import { reportApi } from '../../services/api/reportApi';
 
 const resultSchema = z.object({
   studentName: z.string().min(1, 'Student name is required').min(2, 'Minimum 2 characters required').max(100),
@@ -60,7 +62,7 @@ const ManageResults: React.FC = () => {
   const [villages, setVillages] = useState<Village[]>([]);
   const [standards, setStandards] = useState<Standard[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'gujarati' | 'english'>('gujarati');
+  const [activeTab, setActiveTab] = useState<'gujarati' | 'english' | 'college'>('gujarati');
   const [filters, setFilters] = useState({
     standardId: '',
     villageId: '',
@@ -128,15 +130,43 @@ const ManageResults: React.FC = () => {
   const loadResults = async () => {
     setIsLoading(true);
     try {
-      const filtersToApply: any = {
-        medium: activeTab,
+      let filtersToApply: any = {
         limit: 10000, // Get all results without pagination
       };
+      
+      // For college tab, don't filter by medium, we'll filter by isCollegeLevel
+      if (activeTab === 'college') {
+        // Get all results, we'll filter by college level on frontend
+        filtersToApply = {
+          limit: 10000,
+        };
+      } else {
+        // For gujarati and english tabs, filter by medium
+        filtersToApply.medium = activeTab;
+      }
+      
       if (filters.standardId) filtersToApply.standardId = filters.standardId;
       if (filters.villageId) filtersToApply.villageId = filters.villageId;
       
       const response = await resultApi.getAll(filtersToApply);
-      setResults(response.data);
+      let filteredResults = response.data;
+      
+      // Filter by college level based on active tab
+      if (activeTab === 'college') {
+        // Only show college level results
+        filteredResults = filteredResults.filter((result: Result) => {
+          const standard = typeof result.standardId === 'object' ? result.standardId : null;
+          return standard?.isCollegeLevel === true;
+        });
+      } else {
+        // For gujarati and english tabs, exclude college level results
+        filteredResults = filteredResults.filter((result: Result) => {
+          const standard = typeof result.standardId === 'object' ? result.standardId : null;
+          return standard?.isCollegeLevel !== true;
+        });
+      }
+      
+      setResults(filteredResults);
     } catch (error) {
       console.error('Error loading results:', error);
     } finally {
@@ -222,15 +252,36 @@ const ManageResults: React.FC = () => {
       showSuccess(t('messages.success.resultUpdated'));
       
       // Reload results to get updated data
-      const filtersToApply: any = {
-        medium: activeTab,
+      let filtersToApply: any = {
         limit: 10000,
       };
+      
+      // For college tab, don't filter by medium
+      if (activeTab !== 'college') {
+        filtersToApply.medium = activeTab;
+      }
+      
       if (filters.standardId) filtersToApply.standardId = filters.standardId;
       if (filters.villageId) filtersToApply.villageId = filters.villageId;
       
       const response = await resultApi.getAll(filtersToApply);
-      const updatedResults = response.data;
+      let updatedResults = response.data;
+      
+      // Filter by college level based on active tab
+      if (activeTab === 'college') {
+        // Only show college level results
+        updatedResults = updatedResults.filter((result: Result) => {
+          const standard = typeof result.standardId === 'object' ? result.standardId : null;
+          return standard?.isCollegeLevel === true;
+        });
+      } else {
+        // For gujarati and english tabs, exclude college level results
+        updatedResults = updatedResults.filter((result: Result) => {
+          const standard = typeof result.standardId === 'object' ? result.standardId : null;
+          return standard?.isCollegeLevel !== true;
+        });
+      }
+      
       setResults(updatedResults);
       
       // If save and close, close the modal
@@ -353,6 +404,52 @@ const ManageResults: React.FC = () => {
     return sorted;
   }, [results, sortOrder]);
 
+  const handleDownloadPdf = async () => {
+    try {
+      const filtersToApply: any = {};
+      
+      // For college tab, don't filter by medium
+      if (activeTab !== 'college') {
+        filtersToApply.medium = activeTab;
+      }
+      
+      if (filters.standardId) filtersToApply.standardId = filters.standardId;
+      if (filters.villageId) filtersToApply.villageId = filters.villageId;
+      
+      const blob = await reportApi.exportManageResultsPdf(filtersToApply);
+      saveAs(blob, 'results.pdf');
+    } catch (error) {
+      showError(t('messages.error.serverError'));
+    }
+  };
+
+  const handleDownloadCollegeListByVillage = async () => {
+    try {
+      const blob = await reportApi.exportCollegeListByVillage(activeTab);
+      saveAs(blob, 'college-list-by-village.pdf');
+    } catch (error) {
+      showError(t('messages.error.serverError'));
+    }
+  };
+
+  const handleDownloadSchoolListByVillage = async () => {
+    try {
+      const blob = await reportApi.exportSchoolListByVillage();
+      saveAs(blob, 'school-list-by-village.pdf');
+    } catch (error) {
+      showError(t('messages.error.serverError'));
+    }
+  };
+
+  const handlePrintCollege = async () => {
+    try {
+      const blob = await reportApi.exportPrintCollege();
+      saveAs(blob, 'print-college.pdf');
+    } catch (error) {
+      showError(t('messages.error.serverError'));
+    }
+  };
+
 
   return (
     <Layout>
@@ -370,6 +467,12 @@ const ManageResults: React.FC = () => {
               onClick={() => setActiveTab('english')}
             >
               {t('forms.english')} {t('forms.medium')}
+            </button>
+            <button
+              className={activeTab === 'college' ? styles.activeTab : styles.tab}
+              onClick={() => setActiveTab('college')}
+            >
+              {t('pages.results.college')}
             </button>
           </div>
 
@@ -399,6 +502,31 @@ const ManageResults: React.FC = () => {
               value={filters.villageId}
               onChange={(e) => setFilters({ ...filters, villageId: e.target.value })}
             />
+
+            <Button
+              variant="primary"
+              onClick={handleDownloadPdf}
+            >
+              {t('common.download')} PDF
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleDownloadCollegeListByVillage}
+            >
+              {t('pages.results.collegeList')}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleDownloadSchoolListByVillage}
+            >
+              {t('pages.results.schoolListByVillage')}
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handlePrintCollege}
+            >
+              {t('pages.results.printCollege')}
+            </Button>
           </div>
         </div>
 
