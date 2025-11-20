@@ -458,7 +458,7 @@ export const exportTopThreePdf = async (req, res, next) => {
       },
       content: [],
     };
-    let mediumTitle = (medium == 'gujarati') ? 'ગુજરાતી માધ્યમ' : 'ઇંગ્લીશી માધ્યમ';
+    let mediumTitle = (medium == 'gujarati') ? 'ગુજરાતી માધ્યમ' : 'ઇંગ્લીશી મિડીયમ';
     // Add pages for each rank
     if (rankGroups[1].length > 0) {
       docDefinition.content.push(createRankPage(1, rankGroups[1], mediumTitle + ' ના પહેલા નંબર ના તેજસ્વી તારલાઓ'));
@@ -472,9 +472,10 @@ export const exportTopThreePdf = async (req, res, next) => {
 
     // Generate PDF
     const pdfDoc = printer.createPdfKitDocument(docDefinition);
+    const safeMedium = medium === 'english' ? 'english' : medium === 'gujarati' ? 'gujarati' : 'all';
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=top-three-ranking-'+medium+'.pdf');
-    
+    res.setHeader('Content-Disposition', `attachment; filename=top-three-ranking-${safeMedium}.pdf`);
+
     pdfDoc.pipe(res);
     pdfDoc.end();
   } catch (error) {

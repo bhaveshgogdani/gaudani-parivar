@@ -119,7 +119,7 @@ const TopThreeRankingPage: React.FC = () => {
   const handleDownloadPdf = async () => {
     try {
       const blob = await reportApi.exportTopThreePdf(activeTab);
-      saveAs(blob, 'top-three-ranking.pdf');
+      saveAs(blob, 'top-three-ranking-'+activeTab+'.pdf');
     } catch (error) {
       showError('Error downloading PDF');
     }
