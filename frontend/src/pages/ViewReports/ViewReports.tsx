@@ -7,7 +7,6 @@ import { standardApi } from '../../services/api/standardApi';
 import { Village, Standard } from '../../types/result.types';
 import Layout from '../../components/layout/Layout';
 import Select from '../../components/common/Select/Select';
-import Input from '../../components/common/Input/Input';
 import Button from '../../components/common/Button/Button';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { saveAs } from 'file-saver';

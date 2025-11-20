@@ -10,7 +10,7 @@ import styles from './SettingsPage.module.css';
 const SettingsPage: React.FC = () => {
   const { t } = useTranslation();
   const { showSuccess, showError } = useToast();
-  const [settings, setSettings] = useState<Settings | null>(null);
+  const [, setSettings] = useState<Settings | null>(null);
   const [lastDateToUploadResult, setLastDateToUploadResult] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);

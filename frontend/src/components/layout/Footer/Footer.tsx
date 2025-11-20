@@ -1,9 +1,7 @@
 import React from 'react';
-import { useTranslation } from '../../../i18n/useTranslation';
 import styles from './Footer.module.css';
 
 const Footer: React.FC = () => {
-  const { t } = useTranslation();
 
   return (
     <footer className={styles.footer}>

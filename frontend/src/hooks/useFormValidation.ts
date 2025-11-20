@@ -86,7 +86,6 @@ export const useFormValidation = (rules: ValidationRules) => {
   const validateAll = useCallback(
     (values: Record<string, any>): boolean => {
       let isValid = true;
-      const newErrors: Record<string, string> = {};
 
       Object.keys(rules).forEach((field) => {
         const fieldValid = validate(field, values[field]);
