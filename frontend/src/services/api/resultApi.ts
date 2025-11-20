@@ -1,17 +1,22 @@
 import axios from 'axios';
 import { Result, CreateResultData, ResultFilters } from '../../types/result.types';
+import { getApiBaseUrl } from '../../utils/apiConfig';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-
+// Create axios instance with a default baseURL (will be overridden dynamically)
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: '/api', // Default, will be overridden by interceptor
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-// Add auth token to requests if available
+// Interceptor to dynamically set baseURL based on current hostname
 api.interceptors.request.use((config) => {
+  // Dynamically get the correct API base URL based on current hostname
+  const apiBaseUrl = getApiBaseUrl();
+  config.baseURL = apiBaseUrl;
+  
+  // Add auth token to requests if available
   const token = localStorage.getItem('adminToken');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;

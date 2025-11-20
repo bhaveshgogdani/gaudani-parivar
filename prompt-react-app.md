@@ -1424,7 +1424,7 @@ export const defaultLanguage = 'gu';
 
 ### Frontend (.env)
 ```
-VITE_API_BASE_URL=http://localhost:5000/api
+VITE_API_BASE_URL=http://localhost:5010/api
 VITE_GOOGLE_TRANSLITERATION_API_KEY=your_key_here
 ```
 

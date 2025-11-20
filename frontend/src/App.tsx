@@ -22,10 +22,15 @@ const PrivateRoute: React.FC<{ children: React.ReactElement }> = ({ children }) 
 };
 
 function App() {
+  // Always use /bhavesh as basename to match vite.config.ts base path
+  // This ensures routing works correctly in both localhost and production
+  // API URLs are still detected based on hostname in apiConfig.ts
+  const basename = '/bhavesh';
+
   return (
     <LanguageProvider>
       <ToastProvider>
-        <Router>
+        <Router basename={basename}>
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/upload-result" element={<UploadResultPage />} />

@@ -73,7 +73,7 @@ A modern web application built with React, Vite, Node.js, and MongoDB for the "G
 
    Create `frontend/.env`:
    ```
-   VITE_API_BASE_URL=http://localhost:5000/api
+   VITE_API_BASE_URL=http://localhost:5010/api
    ```
 
 5. **Start the Backend Server**
@@ -90,7 +90,7 @@ A modern web application built with React, Vite, Node.js, and MongoDB for the "G
 
 7. **Access the Application**
    - Frontend: http://localhost:5173
-   - Backend API: http://localhost:5000
+   - Backend API: http://localhost:5010
 
 ## Default Admin Credentials
 
