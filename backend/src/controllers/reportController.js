@@ -458,23 +458,22 @@ export const exportTopThreePdf = async (req, res, next) => {
       },
       content: [],
     };
-
+    let mediumTitle = (medium == 'gujarati') ? 'ગુજરાતી માધ્યમ' : 'ઇંગ્લીશી માધ્યમ';
     // Add pages for each rank
     if (rankGroups[1].length > 0) {
-      docDefinition.content.push(createRankPage(1, rankGroups[1], 'પહેલા નંબર ના તેજસ્વી તારલાઓ'));
+      docDefinition.content.push(createRankPage(1, rankGroups[1], mediumTitle + ' ના પહેલા નંબર ના તેજસ્વી તારલાઓ'));
     }
     if (rankGroups[2].length > 0) {
-      docDefinition.content.push(createRankPage(2, rankGroups[2], 'બીજા નંબર ના તેજસ્વી તારલાઓ'));
+      docDefinition.content.push(createRankPage(2, rankGroups[2], mediumTitle + ' ના બીજા નંબર ના તેજસ્વી તારલાઓ'));
     }
     if (rankGroups[3].length > 0) {
-      docDefinition.content.push(createRankPage(3, rankGroups[3], 'ત્રીજા નંબર ના તેજસ્વી તારલાઓ'));
+      docDefinition.content.push(createRankPage(3, rankGroups[3], mediumTitle + ' ના ત્રીજા નંબર ના તેજસ્વી તારલાઓ'));
     }
 
     // Generate PDF
     const pdfDoc = printer.createPdfKitDocument(docDefinition);
-    
     res.setHeader('Content-Type', 'application/pdf');
-    res.setHeader('Content-Disposition', 'attachment; filename=top-three-ranking.pdf');
+    res.setHeader('Content-Disposition', 'attachment; filename=top-three-ranking-'+medium+'.pdf');
     
     pdfDoc.pipe(res);
     pdfDoc.end();
