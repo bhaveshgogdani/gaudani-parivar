@@ -129,6 +129,49 @@
   justify-content: flex-end;
 }
 
+.uploadClosed {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.uploadClosedTitle {
+  font-size: 2rem;
+  color: #b71c1c;
+  margin: 0;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.uploadClosedDescription {
+  font-size: 1.15rem;
+  color: #4a4a4a;
+  margin: 0 auto;
+  max-width: 600px;
+  line-height: 1.6;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.closedDate {
+  font-size: 1rem;
+  color: #2e7d32;
+  font-weight: 600;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.2rem;
+  color: #666;
+}
+
 .error {
   color: #f44336;
   font-size: 0.875rem;
@@ -188,6 +231,14 @@
 
   .actions {
     flex-direction: column;
+  }
+
+  .uploadClosed {
+    padding: 2rem 1rem;
+  }
+
+  .uploadClosedTitle {
+    font-size: 1.6rem;
   }
 }
 

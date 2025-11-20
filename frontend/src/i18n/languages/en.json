@@ -96,11 +96,26 @@
       "instructionsParagraph": "To upload a result, please follow these steps: First, enter the student's full name (required), then select the medium (Gujarati or English) (required), choose the student's standard (required), select the village family (required), enter total marks and obtained marks (percentage will be calculated automatically), enter contact number (required - 10 digits), and finally upload the result image (required). After filling all the required information, click on the 'Upload Result' button.",
       "uploadResult": "Upload Result",
       "viewResults": "View Results",
-      "calculated": "Calculated"
+      "calculated": "Calculated",
+      "deadlineTitle": "Last Upload Date",
+      "deadlineDateLabel": "Deadline",
+      "deadlineDescription": "Please submit your results before the deadline shown below.",
+      "countdownLabel": "Time left",
+      "deadlineExpired": "Result submission has closed. Please contact the organizers for assistance.",
+      "countdown": {
+        "days": "Days",
+        "hours": "Hours",
+        "minutes": "Minutes",
+        "seconds": "Seconds"
+      }
     },
     "upload": {
       "title": "Add New Result",
-      "subtitle": "Please fill in your result information"
+      "subtitle": "Please fill in your result information",
+      "closedTitle": "Result Submission Closed",
+      "closedDescription": "The deadline to upload results has passed. Please contact the organizers for assistance.",
+      "closedDateLabel": "Last upload date",
+      "closedButton": "Back to Home"
     },
     "results": {
       "title": "Student List",

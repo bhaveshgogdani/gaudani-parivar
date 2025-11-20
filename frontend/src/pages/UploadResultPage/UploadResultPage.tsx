@@ -54,12 +54,14 @@ const resultSchema = z.object({
 type ResultFormData = z.infer<typeof resultSchema>;
 
 const UploadResultPage: React.FC = () => {
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { showError, showWarning } = useToast();
   const navigate = useNavigate();
   const [villages, setVillages] = useState<Village[]>([]);
   const [standards, setStandards] = useState<Standard[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUploadClosed, setIsUploadClosed] = useState(false);
+  const [deadlineDate, setDeadlineDate] = useState<Date | null>(null);
   const [resultImage, setResultImage] = useState<File | null>(null);
   const [calculatedPercentage, setCalculatedPercentage] = useState<number | null>(null);
 
@@ -82,9 +84,41 @@ const UploadResultPage: React.FC = () => {
 
   const totalMarks = watch('totalMarks');
   const obtainedMarks = watch('obtainedMarks');
-  const percentage = watch('percentage');
 
   useEffect(() => {
+    let mounted = true;
+    
+    const fetchSettings = async () => {
+      try {
+        const data = await adminApi.getSettingsPublic();
+        if (!mounted) return;
+        if (data.lastDateToUploadResult) {
+          const displayDate = new Date(data.lastDateToUploadResult);
+          const endOfDay = new Date(data.lastDateToUploadResult);
+          endOfDay.setHours(23, 59, 59, 999);
+          setDeadlineDate(displayDate);
+          setIsUploadClosed(new Date() > endOfDay);
+        } else {
+          setIsUploadClosed(false);
+          setDeadlineDate(null);
+        }
+      } catch (error) {
+        console.error('Error fetching settings:', error);
+        // If settings fail to load, allow uploads (don't block)
+        setIsUploadClosed(false);
+        setDeadlineDate(null);
+      }
+    };
+    
+    fetchSettings();
+    
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    // Load data immediately, don't wait for settings
     loadData();
   }, []);
 
@@ -159,6 +193,35 @@ const UploadResultPage: React.FC = () => {
     setResultImage(null);
     setCalculatedPercentage(null);
   };
+
+  const formatDate = React.useMemo(() => {
+    const locale = language === 'gu' ? 'gu-IN' : 'en-IN';
+    return (date: Date) =>
+      new Intl.DateTimeFormat(locale, {
+        day: 'numeric',
+        month: 'long',
+        year: 'numeric',
+      }).format(date);
+  }, [language]);
+
+  if (isUploadClosed) {
+    return (
+      <Layout>
+        <div className={styles.uploadClosed}>
+          <h1 className={styles.uploadClosedTitle}>{t('pages.upload.closedTitle')}</h1>
+          <p className={styles.uploadClosedDescription}>{t('pages.upload.closedDescription')}</p>
+          {deadlineDate && (
+            <div className={styles.closedDate}>
+              {t('pages.upload.closedDateLabel')}: {formatDate(deadlineDate)}
+            </div>
+          )}
+          <Button variant="primary" size="large" onClick={() => navigate('/')}>
+            {t('pages.upload.closedButton')}
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
 
   return (
     <Layout>

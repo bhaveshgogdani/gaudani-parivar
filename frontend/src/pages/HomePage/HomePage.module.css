@@ -47,6 +47,94 @@
   margin-bottom: 1.5rem;
 }
 
+.deadlineCard {
+  background: linear-gradient(135deg, #fefefe, #f3fff3);
+  border: 1px solid #e0f2e9;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 10px 20px rgba(76, 175, 80, 0.08);
+  text-align: center;
+}
+
+.deadlineHeader h3 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: #2e7d32;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.deadlineDate {
+  margin: 0.5rem 0 0;
+  font-size: 1.1rem;
+  color: #1b5e20;
+  font-weight: 500;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.deadlineDescription {
+  margin: 1rem auto 1.5rem;
+  max-width: 600px;
+  color: #4a4a4a;
+  font-size: 1rem;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.countdownWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.countdownLabel {
+  font-size: 0.9rem;
+  color: #2e7d32;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.countdown {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.countdownItem {
+  min-width: 90px;
+  padding: 0.75rem;
+  border-radius: 8px;
+  background: rgba(76, 175, 80, 0.08);
+  border: 1px solid rgba(76, 175, 80, 0.2);
+  text-align: center;
+}
+
+.countdownItem span {
+  display: block;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #2e7d32;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.countdownItem small {
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: #4a4a4a;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
+.deadlineExpired {
+  margin-top: 1rem;
+  font-size: 1.1rem;
+  color: #b71c1c;
+  font-weight: 600;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+}
+
 .instructionsTitle {
   font-size: 1.5rem;
   color: #333;
@@ -117,6 +205,19 @@
     position: absolute;
     top: 0;
     right: 0;
+  }
+
+  .countdown {
+    gap: 0.5rem;
+  }
+
+  .countdownItem {
+    min-width: 70px;
+    padding: 0.5rem;
+  }
+
+  .countdownItem span {
+    font-size: 1.5rem;
   }
 }
 
