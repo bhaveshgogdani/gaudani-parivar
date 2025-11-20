@@ -5,6 +5,7 @@ import { reportApi } from '../../services/api/reportApi';
 import { resultApi } from '../../services/api/resultApi';
 import { standardApi } from '../../services/api/standardApi';
 import { Standard } from '../../types/result.types';
+import { getImageUrl } from '../../utils/apiConfig';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/common/Button/Button';
 import { saveAs } from 'file-saver';
@@ -161,12 +162,8 @@ const TopThreeRankingPage: React.FC = () => {
     navigate(`/admin/manage-results?resultId=${id}`);
   };
 
-  const getImageUrl = (result: any) => {
-    if (result.resultImageUrl) {
-      return result.resultImageUrl;
-    }
-    return '';
-  };
+  // Use the shared getImageUrl utility function
+  const getResultImageUrl = (result: any) => getImageUrl(result.resultImageUrl);
 
   return (
     <Layout>
@@ -236,7 +233,7 @@ const TopThreeRankingPage: React.FC = () => {
                               ? result.villageId?.villageName
                               : '-';
 
-                          const imageUrl = getImageUrl(result);
+                          const imageUrl = getResultImageUrl(result);
 
                           return (
                     <tr key={result._id}>

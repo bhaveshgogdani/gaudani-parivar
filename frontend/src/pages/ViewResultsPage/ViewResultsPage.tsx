@@ -6,6 +6,7 @@ import { resultApi } from '../../services/api/resultApi';
 import { villageApi } from '../../services/api/villageApi';
 import { standardApi } from '../../services/api/standardApi';
 import { Result, Village, Standard } from '../../types/result.types';
+import { getImageUrl } from '../../utils/apiConfig';
 import Layout from '../../components/layout/Layout';
 import Select from '../../components/common/Select/Select';
 import Input from '../../components/common/Input/Input';
@@ -188,13 +189,8 @@ const ViewResultsPage: React.FC = () => {
     }
   };
 
-  const getImageUrl = (result: Result) => {
-    if (result.resultImageUrl) {
-      // Use relative URL so it goes through Vite proxy in development
-      return result.resultImageUrl;
-    }
-    return '';
-  };
+  // Use the shared getImageUrl utility function
+  const getResultImageUrl = (result: Result) => getImageUrl(result.resultImageUrl);
 
   // Public view - mobile number search
   if (!isAdmin) {
@@ -275,7 +271,7 @@ const ViewResultsPage: React.FC = () => {
                                 <Button
                                   variant="success"
                                   size="small"
-                                  onClick={() => setSelectedImage(getImageUrl(result))}
+                                  onClick={() => setSelectedImage(getResultImageUrl(result))}
                                 >
                                   {t('common.view')}
                                 </Button>
@@ -409,7 +405,7 @@ const ViewResultsPage: React.FC = () => {
                             variant="success"
                             size="small"
                             onClick={() => {
-                              setSelectedImage(getImageUrl(result));
+                              setSelectedImage(getResultImageUrl(result));
                             }}
                             style={{ marginRight: '0.5rem' }}
                           >

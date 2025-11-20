@@ -36,3 +36,36 @@ export const getUploadsBaseUrl = (): string => {
   }
 };
 
+/**
+ * Get the full image URL based on the resultImageUrl from backend
+ * - In localhost: Uses relative URL (goes through Vite proxy)
+ * - In production: Uses full URL with proper base URL
+ * @param resultImageUrl - The image URL from backend (format: /uploads/results/filename.jpg)
+ * @returns Full image URL for the current environment
+ */
+export const getImageUrl = (resultImageUrl: string | undefined): string => {
+  if (!resultImageUrl) {
+    return '';
+  }
+
+  // resultImageUrl is in format /uploads/results/filename.jpg
+  const hostname = window.location.hostname;
+  const isLocalhost = 
+    hostname === 'localhost' || 
+    hostname === '127.0.0.1' || 
+    hostname.startsWith('192.168.') || 
+    hostname.startsWith('10.');
+
+  if (isLocalhost) {
+    // In local development, use relative URL (goes through Vite proxy)
+    return resultImageUrl;
+  } else {
+    // In production, use full URL
+    const uploadsBaseUrl = getUploadsBaseUrl();
+    // Remove /uploads prefix from resultImageUrl and append to base URL
+    const imagePath = resultImageUrl.replace(/^\/uploads/, '');
+    const cleanBaseUrl = uploadsBaseUrl.endsWith('/') ? uploadsBaseUrl.slice(0, -1) : uploadsBaseUrl;
+    return `${cleanBaseUrl}${imagePath}`;
+  }
+};
+

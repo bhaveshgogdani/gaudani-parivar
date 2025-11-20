@@ -5,6 +5,7 @@ import { resultApi } from '../../services/api/resultApi';
 import { villageApi } from '../../services/api/villageApi';
 import { standardApi } from '../../services/api/standardApi';
 import { Result, Village, Standard, CreateResultData } from '../../types/result.types';
+import { getImageUrl } from '../../utils/apiConfig';
 import Layout from '../../components/layout/Layout';
 import Select from '../../components/common/Select/Select';
 import Input from '../../components/common/Input/Input';
@@ -373,14 +374,8 @@ const ManageResults: React.FC = () => {
     return '';
   };
 
-  const getImageUrl = (result: Result) => {
-    if (result.resultImageUrl) {
-      // Use relative URL so it goes through Vite proxy in development
-      // resultImageUrl is already in format /uploads/results/filename.jpg
-      return result.resultImageUrl;
-    }
-    return '';
-  };
+  // Use the shared getImageUrl utility function
+  const getResultImageUrl = (result: Result) => getImageUrl(result.resultImageUrl);
 
   const handleSortByPercentage = () => {
     if (sortOrder === null || sortOrder === 'desc') {
@@ -582,10 +577,10 @@ const ManageResults: React.FC = () => {
                       <td>
                         {result.resultImageUrl && (
                           <img
-                            src={getImageUrl(result)}
+                            src={getResultImageUrl(result)}
                             alt="Result"
                             className={styles.resultThumbnail}
-                            onClick={() => handleImageClick(getImageUrl(result))}
+                            onClick={() => handleImageClick(getResultImageUrl(result))}
                           />
                         )}
                       </td>
@@ -785,10 +780,10 @@ const ManageResults: React.FC = () => {
                 <div className={styles.modalRight}>
                   {selectedResult.resultImageUrl && (
                     <img
-                      src={getImageUrl(selectedResult)}
+                      src={getResultImageUrl(selectedResult)}
                       alt="Result"
                       className={styles.fullImage}
-                      onClick={() => handleImageClick(getImageUrl(selectedResult))}
+                      onClick={() => handleImageClick(getResultImageUrl(selectedResult))}
                     />
                   )}
                 </div>
