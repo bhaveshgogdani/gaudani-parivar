@@ -19,9 +19,8 @@ import styles from './UploadResultPage.module.css';
 
 const resultSchema = z.object({
   studentName: z.string().min(1, 'Student name is required').min(2, 'Minimum 2 characters required').max(100),
-  standardId: z.string().refine((val) => val && val.length > 0 && val !== '', {
-    message: 'Standard is required',
-  }),
+  standardId: z.string().optional(),
+  otherStandardName: z.string().optional(),
   medium: z.enum(['gujarati', 'english'], {
     errorMap: () => ({ message: 'Medium is required' }),
   }),
@@ -48,6 +47,43 @@ const resultSchema = z.object({
   {
     message: 'Obtained marks cannot exceed total marks',
     path: ['obtainedMarks'],
+  }
+).refine(
+  (data) => {
+    // Check if standard is selected (and not "other")
+    const hasStandard = data.standardId && data.standardId !== '' && data.standardId !== 'other';
+    // Check if other standard name is provided (non-empty and valid length)
+    const hasOtherStandard = data.otherStandardName && typeof data.otherStandardName === 'string' && data.otherStandardName.trim().length >= 2;
+    return hasStandard || hasOtherStandard;
+  },
+  {
+    message: 'Either standard or other standard name is required',
+    path: ['standardId'],
+  }
+).refine(
+  (data) => {
+    // Check if standard is selected (and not "other")
+    const hasStandard = data.standardId && data.standardId !== '' && data.standardId !== 'other';
+    // Check if other standard name is provided (non-empty and valid length)
+    const hasOtherStandard = data.otherStandardName && typeof data.otherStandardName === 'string' && data.otherStandardName.trim().length >= 2;
+    // Should not have both
+    return !(hasStandard && hasOtherStandard);
+  },
+  {
+    message: 'Cannot provide both standard and other standard name',
+    path: ['standardId'],
+  }
+).refine(
+  (data) => {
+    // Only validate length if otherStandardName is provided and not empty
+    if (data.otherStandardName && typeof data.otherStandardName === 'string' && data.otherStandardName.trim().length > 0) {
+      return data.otherStandardName.trim().length >= 2 && data.otherStandardName.trim().length <= 100;
+    }
+    return true;
+  },
+  {
+    message: 'Other standard name must be between 2 and 100 characters',
+    path: ['otherStandardName'],
   }
 );
 
@@ -84,6 +120,8 @@ const UploadResultPage: React.FC = () => {
 
   const totalMarks = watch('totalMarks');
   const obtainedMarks = watch('obtainedMarks');
+  const selectedStandardId = watch('standardId');
+  const isOtherStandard = selectedStandardId === 'other';
 
   useEffect(() => {
     let mounted = true;
@@ -174,10 +212,21 @@ const UploadResultPage: React.FC = () => {
     
     setIsLoading(true);
     try {
+      // Prepare the data - handle "other" standard case
       const resultData: CreateResultData = {
         ...data,
         resultImage: resultImage,
       };
+      
+      // If "other" is selected, clear standardId and use otherStandardName
+      if (data.standardId === 'other') {
+        resultData.standardId = undefined;
+        resultData.otherStandardName = data.otherStandardName;
+      } else {
+        // If a regular standard is selected, clear otherStandardName
+        resultData.standardId = data.standardId;
+        resultData.otherStandardName = undefined;
+      }
       await resultApi.create(resultData);
       // Navigate to success page with contact number
       navigate('/result-success', { state: { contactNumber: data.contactNumber } });
@@ -192,6 +241,7 @@ const UploadResultPage: React.FC = () => {
     reset();
     setResultImage(null);
     setCalculatedPercentage(null);
+    setValue('otherStandardName', '');
   };
 
   const formatDate = React.useMemo(() => {
@@ -240,13 +290,38 @@ const UploadResultPage: React.FC = () => {
 
           <Select
             label={<>{t('forms.standard')} <span className={styles.requiredAsterisk}>*</span></>}
-            options={standards.map((s) => ({
-              value: s._id,
-              label: s.standardName,
-            }))}
-            {...register('standardId')}
+            options={[
+              ...standards.map((s) => ({
+                value: s._id,
+                label: s.standardName,
+              })),
+              {
+                value: 'other',
+                label: t('forms.otherStandard'),
+              },
+            ]}
+            {...register('standardId', {
+              onChange: (e) => {
+                const value = e.target.value;
+                if (value !== 'other') {
+                  setValue('otherStandardName', '', { shouldValidate: false });
+                } else {
+                  // When "other" is selected, ensure otherStandardName field is ready
+                  setValue('otherStandardName', '', { shouldValidate: false });
+                }
+              },
+            })}
             error={errors.standardId?.message}
           />
+
+          {isOtherStandard && (
+            <Input
+              label={<>{t('forms.otherStandardName')} <span className={styles.requiredAsterisk}>*</span></>}
+              {...register('otherStandardName')}
+              error={errors.otherStandardName?.message}
+              placeholder={t('forms.otherStandardPlaceholder')}
+            />
+          )}
 
           <div className={styles.radioGroup}>
             <label>{t('forms.medium')} <span className={styles.requiredAsterisk}>*</span></label>

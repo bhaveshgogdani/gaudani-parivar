@@ -40,7 +40,8 @@ export const resultApi = {
   create: async (data: CreateResultData): Promise<Result> => {
     const formData = new FormData();
     formData.append('studentName', data.studentName);
-    formData.append('standardId', data.standardId);
+    if (data.standardId) formData.append('standardId', data.standardId);
+    if (data.otherStandardName) formData.append('otherStandardName', data.otherStandardName);
     formData.append('medium', data.medium);
     if (data.totalMarks) formData.append('totalMarks', data.totalMarks.toString());
     if (data.obtainedMarks) formData.append('obtainedMarks', data.obtainedMarks.toString());

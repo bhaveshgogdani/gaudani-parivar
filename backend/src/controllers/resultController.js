@@ -7,6 +7,7 @@ export const createResult = async (req, res, next) => {
     const {
       studentName,
       standardId,
+      otherStandardName,
       medium,
       totalMarks,
       obtainedMarks,
@@ -44,6 +45,59 @@ export const createResult = async (req, res, next) => {
       });
     }
 
+    // Validate standard: either standardId or otherStandardName must be provided
+    // Note: standardId can be "other" or undefined when using otherStandardName
+    const isOtherStandard = standardId === 'other' || (!standardId && otherStandardName);
+    
+    if (!standardId && !otherStandardName) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Either standard or other standard name is required',
+      });
+    }
+
+    // If both are provided and standardId is not "other", that's an error
+    if (standardId && standardId !== 'other' && otherStandardName) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Cannot provide both standard and other standard name',
+      });
+    }
+
+    // Handle standard selection
+    let finalStandardId = null;
+    let finalOtherStandardName = null;
+    
+    if (isOtherStandard) {
+      // Using "other" standard - validate otherStandardName
+      if (!otherStandardName || typeof otherStandardName !== 'string') {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Other standard name is required when selecting "Other"',
+        });
+      }
+      finalOtherStandardName = otherStandardName.trim();
+      if (finalOtherStandardName.length < 2 || finalOtherStandardName.length > 100) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Other standard name must be between 2 and 100 characters',
+        });
+      }
+      // Don't set standardId when using otherStandardName
+      finalStandardId = null;
+    } else if (standardId) {
+      // Using a regular standard - validate standardId
+      if (!mongoose.Types.ObjectId.isValid(standardId)) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Invalid standard ID',
+        });
+      }
+      finalStandardId = standardId;
+      // Ensure otherStandardName is not set
+      finalOtherStandardName = null;
+    }
+
     // Calculate percentage from marks (always recalculate in backend)
     let calculatedPercentage = 0;
     if (totalMarks && obtainedMarks) {
@@ -61,7 +115,8 @@ export const createResult = async (req, res, next) => {
 
     const result = new Result({
       studentName,
-      standardId,
+      standardId: finalStandardId,
+      otherStandardName: finalOtherStandardName,
       medium,
       totalMarks: totalMarks ? parseFloat(totalMarks) : undefined,
       obtainedMarks: obtainedMarks ? parseFloat(obtainedMarks) : undefined,
@@ -74,7 +129,9 @@ export const createResult = async (req, res, next) => {
     });
 
     await result.save();
-    await result.populate('standardId', 'standardName standardCode');
+    if (finalStandardId) {
+      await result.populate('standardId', 'standardName standardCode');
+    }
     await result.populate('villageId', 'villageName');
 
     res.status(201).json({
@@ -177,7 +234,36 @@ export const getResultById = async (req, res, next) => {
 export const updateResult = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    const {
+      standardId,
+      otherStandardName,
+      ...restData
+    } = req.body;
+
+    const updateData = { ...restData };
+
+    // Handle standard: either standardId or otherStandardName
+    if (standardId && standardId !== 'other') {
+      // Validate that standardId is a valid ObjectId
+      if (!mongoose.Types.ObjectId.isValid(standardId)) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Invalid standard ID',
+        });
+      }
+      updateData.standardId = standardId;
+      updateData.otherStandardName = undefined; // Clear otherStandardName if standardId is provided
+    } else if (otherStandardName) {
+      const trimmedOtherStandardName = otherStandardName.trim();
+      if (trimmedOtherStandardName.length < 2 || trimmedOtherStandardName.length > 100) {
+        return res.status(400).json({
+          status: 'error',
+          message: 'Other standard name must be between 2 and 100 characters',
+        });
+      }
+      updateData.standardId = null; // Clear standardId if otherStandardName is provided
+      updateData.otherStandardName = trimmedOtherStandardName;
+    }
 
     // When admin edits, use the percentage value they provide directly (no recalculation)
     // Only round to 2 decimal places to ensure consistency

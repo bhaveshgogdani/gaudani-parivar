@@ -21,9 +21,8 @@ import { reportApi } from '../../services/api/reportApi';
 
 const resultSchema = z.object({
   studentName: z.string().min(1, 'Student name is required').min(2, 'Minimum 2 characters required').max(100),
-  standardId: z.string().refine((val) => val && val.length > 0 && val !== '', {
-    message: 'Standard is required',
-  }),
+  standardId: z.string().optional(),
+  otherStandardName: z.string().optional(),
   medium: z.enum(['gujarati', 'english'], {
     errorMap: () => ({ message: 'Medium is required' }),
   }),
@@ -51,6 +50,37 @@ const resultSchema = z.object({
   {
     message: 'Obtained marks cannot exceed total marks',
     path: ['obtainedMarks'],
+  }
+).refine(
+  (data) => {
+    const hasStandard = data.standardId && data.standardId !== '' && data.standardId !== 'other';
+    const hasOtherStandard = data.otherStandardName && data.otherStandardName.trim().length >= 2;
+    return hasStandard || hasOtherStandard;
+  },
+  {
+    message: 'Either standard or other standard name is required',
+    path: ['standardId'],
+  }
+).refine(
+  (data) => {
+    const hasStandard = data.standardId && data.standardId !== '' && data.standardId !== 'other';
+    const hasOtherStandard = data.otherStandardName && data.otherStandardName.trim().length >= 2;
+    return !(hasStandard && hasOtherStandard);
+  },
+  {
+    message: 'Cannot provide both standard and other standard name',
+    path: ['standardId'],
+  }
+).refine(
+  (data) => {
+    if (data.otherStandardName) {
+      return data.otherStandardName.trim().length >= 2 && data.otherStandardName.trim().length <= 100;
+    }
+    return true;
+  },
+  {
+    message: 'Other standard name must be between 2 and 100 characters',
+    path: ['otherStandardName'],
   }
 );
 
@@ -94,6 +124,8 @@ const ManageResults: React.FC = () => {
 
   const totalMarks = watch('totalMarks');
   const obtainedMarks = watch('obtainedMarks');
+  const selectedStandardId = watch('standardId');
+  const isOtherStandard = selectedStandardId === 'other';
 
   useEffect(() => {
     loadData();
@@ -181,12 +213,23 @@ const ManageResults: React.FC = () => {
     setResultImage(null);
     setFullImageUrl(null);
     
-    const standardId = typeof result.standardId === 'object' ? result.standardId._id : result.standardId;
     const villageId = typeof result.villageId === 'object' ? result.villageId._id : result.villageId;
+    
+    // Handle standard: if otherStandardName exists, use "other", otherwise use standardId
+    let standardId: string;
+    let otherStandardName: string | undefined;
+    if (result.otherStandardName) {
+      standardId = 'other';
+      otherStandardName = result.otherStandardName;
+    } else {
+      standardId = typeof result.standardId === 'object' ? result.standardId._id : (result.standardId || '');
+      otherStandardName = undefined;
+    }
     
     reset({
       studentName: result.studentName,
       standardId: standardId,
+      otherStandardName: otherStandardName,
       medium: result.medium,
       totalMarks: result.totalMarks,
       obtainedMarks: result.obtainedMarks,
@@ -242,9 +285,20 @@ const ManageResults: React.FC = () => {
     
     setIsLoading(true);
     try {
+      // Prepare the data - handle "other" standard case
       const resultData: Partial<CreateResultData> = {
         ...data,
       };
+      
+      // If "other" is selected, clear standardId and use otherStandardName
+      if (data.standardId === 'other') {
+        resultData.standardId = undefined;
+        resultData.otherStandardName = data.otherStandardName;
+      } else {
+        // If a regular standard is selected, clear otherStandardName
+        resultData.standardId = data.standardId;
+        resultData.otherStandardName = undefined;
+      }
       if (resultImage) {
         resultData.resultImage = resultImage;
       }
@@ -294,11 +348,22 @@ const ManageResults: React.FC = () => {
         if (updatedResult) {
           setSelectedResult(updatedResult);
           // Reset form with updated data
-          const standardId = typeof updatedResult.standardId === 'object' ? updatedResult.standardId._id : updatedResult.standardId;
           const villageId = typeof updatedResult.villageId === 'object' ? updatedResult.villageId._id : updatedResult.villageId;
+          
+          // Handle standard: if otherStandardName exists, use "other", otherwise use standardId
+          let standardId: string;
+          let otherStandardName: string | undefined;
+          if (updatedResult.otherStandardName) {
+            standardId = 'other';
+            otherStandardName = updatedResult.otherStandardName;
+          } else {
+            standardId = typeof updatedResult.standardId === 'object' ? updatedResult.standardId._id : (updatedResult.standardId || '');
+            otherStandardName = undefined;
+          }
           reset({
             studentName: updatedResult.studentName,
             standardId: standardId,
+            otherStandardName: otherStandardName,
             medium: updatedResult.medium,
             totalMarks: updatedResult.totalMarks,
             obtainedMarks: updatedResult.obtainedMarks,
@@ -361,6 +426,9 @@ const ManageResults: React.FC = () => {
   };
 
   const getStandardName = (result: Result) => {
+    if (result.otherStandardName) {
+      return result.otherStandardName;
+    }
     if (typeof result.standardId === 'object') {
       return result.standardId.standardName;
     }
@@ -676,13 +744,35 @@ const ManageResults: React.FC = () => {
 
                       <Select
                         label={<>{t('forms.standard')} <span className={styles.required}>*</span></>}
-                        options={standards.map((s) => ({
-                          value: s._id,
-                          label: s.standardName,
-                        }))}
-                        {...register('standardId')}
+                        options={[
+                          ...standards.map((s) => ({
+                            value: s._id,
+                            label: s.standardName,
+                          })),
+                          {
+                            value: 'other',
+                            label: t('forms.otherStandard'),
+                          },
+                        ]}
+                        {...register('standardId', {
+                          onChange: (e) => {
+                            const value = e.target.value;
+                            if (value !== 'other') {
+                              setValue('otherStandardName', '');
+                            }
+                          },
+                        })}
                         error={errors.standardId?.message}
                       />
+
+                      {isOtherStandard && (
+                        <Input
+                          label={<>{t('forms.otherStandardName')} <span className={styles.required}>*</span></>}
+                          {...register('otherStandardName')}
+                          error={errors.otherStandardName?.message}
+                          placeholder={t('forms.otherStandardPlaceholder')}
+                        />
+                      )}
 
                       <div className={styles.marksSection}>
                         <Input

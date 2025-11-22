@@ -57,7 +57,10 @@
     "standardCode": "Code",
     "displayOrder": "Order",
     "isCollegeLevel": "College Level",
-    "isActive": "Active Status"
+    "isActive": "Active Status",
+    "otherStandard": "Other",
+    "otherStandardName": "Other Standard Name",
+    "otherStandardPlaceholder": "Enter standard name if not available in list"
   },
   "messages": {
     "success": {

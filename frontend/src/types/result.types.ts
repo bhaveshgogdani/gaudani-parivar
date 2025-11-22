@@ -1,7 +1,8 @@
 export interface Result {
   _id: string;
   studentName: string;
-  standardId: Standard | string;
+  standardId?: Standard | string;
+  otherStandardName?: string;
   medium: 'gujarati' | 'english';
   totalMarks?: number;
   obtainedMarks?: number;
@@ -38,7 +39,8 @@ export interface Standard {
 
 export interface CreateResultData {
   studentName: string;
-  standardId: string;
+  standardId?: string;
+  otherStandardName?: string;
   medium: 'gujarati' | 'english';
   totalMarks?: number;
   obtainedMarks?: number;

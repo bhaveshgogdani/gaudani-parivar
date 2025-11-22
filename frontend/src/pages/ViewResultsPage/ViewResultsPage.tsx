@@ -387,7 +387,9 @@ const ViewResultsPage: React.FC = () => {
                     <td>{index + 1}</td>
                     <td>{result.studentName}</td>
                     <td>
-                      {typeof result.standardId === 'object'
+                      {result.otherStandardName
+                        ? result.otherStandardName
+                        : typeof result.standardId === 'object'
                         ? result.standardId.standardName
                         : ''}
                     </td>

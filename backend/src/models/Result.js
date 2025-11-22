@@ -12,7 +12,14 @@ const ResultSchema = new mongoose.Schema(
     standardId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Standard',
-      required: true,
+      required: false,
+    },
+    otherStandardName: {
+      type: String,
+      trim: true,
+      minlength: 2,
+      maxlength: 100,
+      required: false,
     },
     medium: {
       type: String,
@@ -70,6 +77,19 @@ const ResultSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+// Custom validation: Either standardId or otherStandardName must be provided
+ResultSchema.pre('validate', function(next) {
+  if (!this.standardId && !this.otherStandardName) {
+    this.invalidate('standardId', 'Either standard or other standard name is required');
+    this.invalidate('otherStandardName', 'Either standard or other standard name is required');
+  }
+  if (this.standardId && this.otherStandardName) {
+    this.invalidate('standardId', 'Cannot provide both standard and other standard name');
+    this.invalidate('otherStandardName', 'Cannot provide both standard and other standard name');
+  }
+  next();
+});
 
 // Indexes for better query performance
 ResultSchema.index({ standardId: 1 });

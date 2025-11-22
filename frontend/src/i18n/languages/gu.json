@@ -57,7 +57,10 @@
     "standardCode": "કોડ",
     "displayOrder": "ક્રમ",
     "isCollegeLevel": "કોલેજ સ્તર",
-    "isActive": "સક્રિય સ્થિતિ"
+    "isActive": "સક્રિય સ્થિતિ",
+    "otherStandard": "અન્ય",
+    "otherStandardName": "અન્ય ધોરણ નું નામ",
+    "otherStandardPlaceholder": "જો યાદીમાં ધોરણ ઉપલબ્ધ ન હોય તો ધોરણ નું નામ દાખલ કરો"
   },
   "messages": {
     "success": {
