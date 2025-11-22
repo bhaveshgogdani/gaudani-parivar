@@ -146,9 +146,6 @@ const TopThreeRankingPage: React.FC = () => {
     }
   };
 
-  const handlePrint = () => {
-    window.print();
-  };
 
   const currentResults = activeTab === 'gujarati' ? gujaratiResults : englishResults;
 
@@ -188,9 +185,6 @@ const TopThreeRankingPage: React.FC = () => {
           <div className={styles.actions}>
           <Button variant="primary" onClick={handleDownloadPdf}>
             {t('pages.topThree.downloadPdf')}
-            </Button>
-          <Button variant="secondary" onClick={handlePrint}>
-            {t('common.print')}
             </Button>
         </div>
 
