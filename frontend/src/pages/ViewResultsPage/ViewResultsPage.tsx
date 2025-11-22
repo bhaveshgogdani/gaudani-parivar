@@ -240,6 +240,7 @@ const ViewResultsPage: React.FC = () => {
                     <h2>{t('pages.viewResults.yourResults')} ({results.length})</h2>
                     <p>{t('pages.success.mobileNumber')}: <strong>{mobileNumber}</strong></p>
                   </div>
+                  {/* Desktop Table View */}
                   <div className={styles.tableContainer}>
                     <table className={styles.table}>
                       <thead>
@@ -288,6 +289,59 @@ const ViewResultsPage: React.FC = () => {
                         ))}
                       </tbody>
                     </table>
+                  </div>
+                  {/* Mobile Card View */}
+                  <div className={styles.cardsContainer}>
+                    {results.map((result, index) => (
+                      <div key={result._id} className={styles.resultCard}>
+                        <div className={styles.cardHeader}>
+                          <div className={styles.cardSrNoContainer}>
+                            <span className={styles.cardSrNoLabel}>{t('pages.results.srNo')}</span>
+                            <span className={styles.cardSrNo}>#{index + 1}</span>
+                          </div>
+                          <div className={styles.cardPercentageContainer}>
+                            <span className={styles.cardPercentageLabel}>{t('pages.results.percentage')}</span>
+                            <span className={styles.cardPercentage}>{result.percentage.toFixed(2)}%</span>
+                          </div>
+                        </div>
+                        <div className={styles.cardBody}>
+                          <div className={styles.cardField}>
+                            <span className={styles.cardLabel}>{t('pages.results.studentName')}:</span>
+                            <span className={styles.cardValue}>{result.studentName}</span>
+                          </div>
+                          <div className={styles.cardField}>
+                            <span className={styles.cardLabel}>{t('pages.results.standard')}:</span>
+                            <span className={styles.cardValue}>
+                              {typeof result.standardId === 'object'
+                                ? result.standardId.standardName
+                                : ''}
+                            </span>
+                          </div>
+                          <div className={styles.cardField}>
+                            <span className={styles.cardLabel}>{t('pages.results.village')}:</span>
+                            <span className={styles.cardValue}>
+                              {typeof result.villageId === 'object'
+                                ? result.villageId.villageName
+                                : ''}
+                            </span>
+                          </div>
+                          {(result.resultImageUrl || result.resultImage2Url) && (
+                            <div className={styles.cardActions}>
+                              <Button
+                                variant="success"
+                                size="small"
+                                onClick={() => {
+                                  setSelectedImage(result.resultImageUrl ? getResultImageUrl(result) : null);
+                                  setSelectedImage2(result.resultImage2Url ? getResultImage2Url(result)! : null);
+                                }}
+                              >
+                                {t('common.view')} {t('pages.viewResults.resultImage')}
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </>
               )}

@@ -404,5 +404,122 @@
   .resultsHeader strong {
     font-size: 0.75rem;
   }
+
+  /* Hide table on mobile, show cards */
+  .tableContainer {
+    display: none;
+  }
+
+  .cardsContainer {
+    display: block;
+    margin-top: 1rem;
+  }
+
+  .resultCard {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border: 1px solid #e8e8e8;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .resultCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #f0f0f0;
+  }
+
+  .cardSrNoContainer,
+  .cardPercentageContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    align-items: flex-start;
+  }
+
+  .cardSrNoLabel,
+  .cardPercentageLabel {
+    font-size: 0.75rem;
+    color: #666;
+    font-weight: 500;
+    font-family: 'Noto Sans Gujarati', sans-serif;
+  }
+
+  .cardSrNo {
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 0.3rem 0.75rem;
+    border-radius: 20px;
+    font-family: 'Noto Sans Gujarati', sans-serif;
+  }
+
+  .cardPercentage {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #4caf50;
+    font-family: 'Noto Sans Gujarati', sans-serif;
+  }
+
+  .cardBody {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .cardField {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .cardLabel {
+    font-size: 0.8rem;
+    color: #666;
+    font-weight: 500;
+    font-family: 'Noto Sans Gujarati', sans-serif;
+  }
+
+  .cardValue {
+    font-size: 0.95rem;
+    color: #2c3e50;
+    font-weight: 600;
+    font-family: 'Noto Sans Gujarati', sans-serif;
+    word-wrap: break-word;
+  }
+
+  .cardActions {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .cardActions :global(.button) {
+    width: 100%;
+    min-height: 44px;
+    font-size: 0.95rem;
+  }
+}
+
+/* Show table on desktop, hide cards */
+@media (min-width: 768px) {
+  .tableContainer {
+    display: block;
+  }
+
+  .cardsContainer {
+    display: none;
+  }
 }
 
