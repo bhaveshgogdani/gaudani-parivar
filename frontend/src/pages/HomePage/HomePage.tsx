@@ -27,6 +27,7 @@ const HomePage: React.FC = () => {
   const [hasDeadline, setHasDeadline] = useState(false);
   const [isDeadlineExpired, setIsDeadlineExpired] = useState(false);
   const [isCountdownActive, setIsCountdownActive] = useState(false);
+  const [hasReadInstructions, setHasReadInstructions] = useState(false);
 
   const formatDate = useMemo(() => {
     const locale = language === 'gu' ? 'gu-IN' : 'en-IN';
@@ -165,16 +166,142 @@ const HomePage: React.FC = () => {
           </div>
         )}
 
+        <div className={styles.importantInstructionsSection}>
+          <h2 className={styles.importantInstructionsTitle}>
+            {t('pages.home.importantInstructionsTitle')}
+          </h2>
+          
+          <div className={styles.instructionsGrid}>
+            <div className={styles.instructionCard}>
+              <h3 className={styles.instructionCardTitle}>
+                {t('pages.home.eligibility.title')}
+              </h3>
+              <p className={styles.instructionCardText}>
+                {t('pages.home.eligibility.description')}
+              </p>
+            </div>
+
+            <div className={styles.instructionCard}>
+              <h3 className={styles.instructionCardTitle}>
+                {t('pages.home.deadlineInfo.title')}
+              </h3>
+              <p className={styles.instructionCardText}>
+                {t('pages.home.deadlineInfo.description')}
+              </p>
+            </div>
+
+            <div className={styles.instructionCard}>
+              <h3 className={styles.instructionCardTitle}>
+                {t('pages.home.examYear.title')}
+              </h3>
+              <p className={styles.instructionCardText}>
+                {t('pages.home.examYear.description')}
+              </p>
+            </div>
+
+            <div className={styles.instructionCard}>
+              <h3 className={styles.instructionCardTitle}>
+                {t('pages.home.photoUpload.title')}
+              </h3>
+              <p className={styles.instructionCardText}>
+                {t('pages.home.photoUpload.description')}
+              </p>
+              <ul className={styles.instructionList}>
+                <li>{t('pages.home.photoUpload.point1')}</li>
+                <li>{t('pages.home.photoUpload.point2')}</li>
+              </ul>
+              <p className={styles.instructionNote}>
+                {t('pages.home.photoUpload.note')}
+              </p>
+            </div>
+
+            <div className={styles.instructionCard}>
+              <h3 className={styles.instructionCardTitle}>
+                {t('pages.home.standardInfo.title')}
+              </h3>
+              <p className={styles.instructionCardText}>
+                {t('pages.home.standardInfo.description')}
+              </p>
+            </div>
+
+            <div className={styles.instructionCard}>
+              <h3 className={styles.instructionCardTitle}>
+                {t('pages.home.formRules.title')}
+              </h3>
+              <p className={styles.instructionCardText}>
+                {t('pages.home.formRules.description')}
+              </p>
+            </div>
+
+            <div className={styles.instructionCard}>
+              <h3 className={styles.instructionCardTitle}>
+                {t('pages.home.viewResults.title')}
+              </h3>
+              <p className={styles.instructionCardText}>
+                {t('pages.home.viewResults.description')}
+              </p>
+              <ul className={styles.instructionList}>
+                <li>{t('pages.home.viewResults.point1')}</li>
+                <li>{t('pages.home.viewResults.point2')}</li>
+                <li>{t('pages.home.viewResults.point3')}</li>
+              </ul>
+            </div>
+
+            <div className={styles.instructionCard}>
+              <h3 className={styles.instructionCardTitle}>
+                {t('pages.home.resultGraph.title')}
+              </h3>
+              <p className={styles.instructionCardText}>
+                {t('pages.home.resultGraph.description')}
+              </p>
+            </div>
+
+            <div className={styles.instructionCard}>
+              <h3 className={styles.instructionCardTitle}>
+                {t('pages.home.incompleteResults.title')}
+              </h3>
+              <p className={styles.instructionCardText}>
+                {t('pages.home.incompleteResults.description')}
+              </p>
+            </div>
+          </div>
+
+          <div className={styles.finalChecklistCard}>
+            <h3 className={styles.finalChecklistTitle}>
+              {t('pages.home.finalChecklist.title')}
+            </h3>
+            <ul className={styles.checklistList}>
+              <li>{t('pages.home.finalChecklist.point1')}</li>
+              <li>{t('pages.home.finalChecklist.point2')}</li>
+              <li>{t('pages.home.finalChecklist.point3')}</li>
+            </ul>
+          </div>
+        </div>
+
         <div className={styles.instructionsSection}>
           <h2 className={styles.instructionsTitle}>{t('pages.home.instructionsTitle')}</h2>
           <p className={styles.instructionsParagraph}>{t('pages.home.instructionsParagraph')}</p>
         </div>
 
         <div className={styles.actionsSection}>
+          <div className={styles.checkboxWrapper}>
+            <label className={styles.checkboxLabel}>
+              <input
+                type="checkbox"
+                checked={hasReadInstructions}
+                onChange={(e) => setHasReadInstructions(e.target.checked)}
+                className={styles.checkbox}
+              />
+              <span className={styles.checkboxText}>
+                {t('pages.home.readInstructionsCheckbox')}
+              </span>
+            </label>
+          </div>
           <Button
             variant="primary"
             size="large"
             onClick={() => navigate('/upload-result')}
+            disabled={!hasReadInstructions}
           >
             {t('pages.home.uploadResult')}
           </Button>

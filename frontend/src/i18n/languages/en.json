@@ -107,6 +107,56 @@
         "hours": "Hours",
         "minutes": "Minutes",
         "seconds": "Seconds"
+      },
+      "readInstructionsCheckbox": "I have read all instructions carefully",
+      "importantInstructionsTitle": "Important Instructions — For Uploading Results",
+      "eligibility": {
+        "title": "Eligibility",
+        "description": "This result upload is only for Gaudani family members permanently residing in Surat. Members from other areas are not eligible to fill this form."
+      },
+      "deadlineInfo": {
+        "title": "Result Upload Deadline",
+        "description": "This page will be visible only until 20 December 2025. No results will be accepted after this date."
+      },
+      "examYear": {
+        "title": "Which Exam Year Result to Upload?",
+        "description": "Only upload results from March 2025 exams. Results from any other year will not be accepted."
+      },
+      "photoUpload": {
+        "title": "How Many Photos Can Be Uploaded?",
+        "description": "You can upload a maximum of 2 photos:",
+        "point1": "Clear result photo (mandatory)",
+        "point2": "Additional proof photo (if required)",
+        "note": "A clear, visible result photo is mandatory. Blurry or unclear results will not be accepted and will be cancelled."
+      },
+      "standardInfo": {
+        "title": "Standard (Study Level)",
+        "description": "All study levels after 12th standard (such as Diploma, Graduation, Masters, etc.) have been added to the standards — so please select the appropriate option."
+      },
+      "formRules": {
+        "title": "Form Filling Rules",
+        "description": "All information requested in the form is mandatory. If any information is left blank, the form will not be submitted."
+      },
+      "viewResults": {
+        "title": "Where Can I View the Submitted Result?",
+        "description": "After submission, you can view:",
+        "point1": "Your uploaded photo",
+        "point2": "Percentage, marks and details",
+        "point3": "On the verification page"
+      },
+      "resultGraph": {
+        "title": "About Result Graph",
+        "description": "Results will be displayed in the graph by standard. (If any standard appears missing, please contact the technical team.)"
+      },
+      "incompleteResults": {
+        "title": "Incomplete Results / Errors",
+        "description": "If the result is incomplete, unclear, or not according to the rules, that result will be cancelled and will not be accepted."
+      },
+      "finalChecklist": {
+        "title": "Final Checklist",
+        "point1": "All details are correct",
+        "point2": "Result photo is clear",
+        "point3": "Correct year is selected"
       }
     },
     "upload": {

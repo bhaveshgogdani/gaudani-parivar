@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from '../../../i18n/useTranslation';
 import LanguageSwitcher from '../../common/LanguageSwitcher/LanguageSwitcher';
 import Button from '../../common/Button/Button';
@@ -8,8 +8,10 @@ import styles from './Header.module.css';
 const Header: React.FC = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const isAdmin = localStorage.getItem('adminToken');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isHomePage = location.pathname === '/';
 
   const handleLogout = () => {
     localStorage.removeItem('adminToken');
@@ -72,7 +74,7 @@ const Header: React.FC = () => {
         <nav className={styles.nav}>
           {!isAdmin && (
             <>
-              <Link to="/upload-result">{t('navigation.addResult')}</Link>
+              {!isHomePage && <Link to="/upload-result">{t('navigation.addResult')}</Link>}
               <Link to="/view-results">{t('navigation.viewResult')}</Link>
               <div className={styles.kuldevi}>
                 || કુળદેવી આઈ શ્રી ખોડીયાર માતાજી ||
@@ -110,7 +112,7 @@ const Header: React.FC = () => {
             <nav className={styles.mobileNav}>
               {!isAdmin && (
                 <>
-                  <Link to="/upload-result" onClick={closeMenu}>{t('navigation.addResult')}</Link>
+                  {!isHomePage && <Link to="/upload-result" onClick={closeMenu}>{t('navigation.addResult')}</Link>}
                   <Link to="/view-results" onClick={closeMenu}>{t('navigation.viewResult')}</Link>
                   <div className={styles.mobileKuldevi}>
                     || કુળદેવી આઈ શ્રી ખોડીયાર માતાજી ||
