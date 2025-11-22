@@ -167,11 +167,150 @@
   font-size: 1.2rem;
 }
 
-.instructionsSection {
-  background: #f5f5f5;
-  padding: 1.5rem;
-  border-radius: 8px;
+.instructionsCard {
+  background: linear-gradient(135deg, #ffffff, #f8f9fa);
+  border: 2px solid #e3f2fd;
+  border-radius: 16px;
+  padding: 2rem;
   margin-bottom: 1.5rem;
+  box-shadow: 0 8px 16px rgba(33, 150, 243, 0.1);
+}
+
+.instructionsCardTitle {
+  font-size: 1.75rem;
+  color: #1976d2;
+  margin: 0 0 1rem 0;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.instructionsCardIntro {
+  font-size: 1.1rem;
+  color: #424242;
+  margin: 0 0 1.5rem 0;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  text-align: center;
+  font-weight: 500;
+  line-height: 1.6;
+}
+
+.instructionsStepsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.instructionStep {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-left: 4px solid #4caf50;
+  border-radius: 8px;
+  padding: 0.875rem 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.instructionStep:hover {
+  box-shadow: 0 4px 8px rgba(76, 175, 80, 0.15);
+  border-left-color: #2e7d32;
+  transform: translateX(4px);
+}
+
+.stepContent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.stepTitle {
+  font-size: 1.05rem;
+  color: #2e7d32;
+  margin: 0;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  font-weight: 600;
+  line-height: 1.5;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.stepArrow {
+  font-size: 1rem;
+  color: #4caf50;
+  margin: 0 0.5rem;
+  flex-shrink: 0;
+  line-height: 1.5;
+}
+
+.stepDescription {
+  font-size: 0.95rem;
+  color: #555;
+  margin: 0;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  line-height: 1.5;
+  flex: 1;
+  min-width: 200px;
+}
+
+.combinedNotesSection {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border: 2px solid #ff9800;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.notesTitle {
+  font-size: 1.2rem;
+  color: #e65100;
+  margin: 0 0 0.75rem 0;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  font-weight: 700;
+}
+
+.checklistTitle {
+  font-size: 1.2rem;
+  color: #1b5e20;
+  margin: 1.5rem 0 0.75rem 0;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  font-weight: 700;
+}
+
+.notesList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.notesList li {
+  font-size: 0.95rem;
+  color: #5d4037;
+  margin-bottom: 0.5rem;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  line-height: 1.6;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.notesList li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+}
+
+.instructionsRequest {
+  font-size: 1rem;
+  color: #1976d2;
+  margin: 0;
+  font-family: 'Noto Sans Gujarati', sans-serif;
+  font-weight: 500;
+  text-align: center;
+  padding: 0.75rem;
+  background: #e3f2fd;
+  border-radius: 8px;
+  line-height: 1.6;
 }
 
 .deadlineCard {
@@ -270,15 +409,6 @@
   text-align: center;
 }
 
-.instructionsParagraph {
-  text-align: left;
-  max-width: 800px;
-  margin: 0 auto;
-  font-size: 1.2rem;
-  color: #666;
-  line-height: 1.6;
-  font-family: 'Noto Sans Gujarati', sans-serif;
-}
 
 .actionsSection {
   display: flex;
@@ -429,23 +559,94 @@
     padding-left: 1.5rem;
   }
 
-  .instructionsSection {
-    padding: 1rem;
+  .instructionsCard {
+    padding: 1.25rem;
     margin-bottom: 1rem;
+    border-radius: 12px;
+  }
+
+  .instructionsCardTitle {
+    font-size: 1.3rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .instructionsCardIntro {
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+    line-height: 1.5;
+  }
+
+  .instructionsStepsList {
+    gap: 0.75rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .instructionStep {
+    padding: 0.75rem 1rem;
     border-radius: 6px;
   }
 
-  .instructionsTitle {
-    font-size: 1.2rem;
-    margin-bottom: 0.5rem;
-    line-height: 1.4;
+  .stepContent {
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    align-items: center;
   }
 
-  .instructionsParagraph {
+  .stepTitle {
     font-size: 0.95rem;
+    margin: 0;
+    line-height: 1.4;
+    white-space: normal;
+    flex-shrink: 0;
+  }
+
+  .stepArrow {
+    font-size: 0.9rem;
+    margin: 0 0.4rem;
+  }
+
+  .stepDescription {
+    font-size: 0.85rem;
+    line-height: 1.4;
+    min-width: 0;
+    flex: 1;
+  }
+
+  .combinedNotesSection {
+    padding: 1rem;
+    border-radius: 10px;
+    margin-bottom: 0.75rem;
+  }
+
+  .notesTitle {
+    font-size: 1.1rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .notesList li {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    padding-left: 1.25rem;
     line-height: 1.5;
-    word-wrap: break-word;
-    text-align: left;
+  }
+
+  .checklistTitle {
+    font-size: 1.1rem;
+    margin: 1.25rem 0 0.6rem 0;
+  }
+
+  .checklistList li {
+    font-size: 0.9rem;
+    margin-bottom: 0.4rem;
+    padding-left: 1.5rem;
+    line-height: 1.5;
+  }
+
+  .instructionsRequest {
+    font-size: 0.95rem;
+    padding: 0.6rem;
+    line-height: 1.5;
   }
 
   .actionsSection {

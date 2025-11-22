@@ -39,6 +39,10 @@ const HomePage: React.FC = () => {
       }).format(date);
   }, [language]);
 
+  const currentYear = useMemo(() => {
+    return new Date().getFullYear();
+  }, []);
+
   useEffect(() => {
     let mounted = true;
     const fetchSettings = async () => {
@@ -186,7 +190,9 @@ const HomePage: React.FC = () => {
                 {t('pages.home.deadlineInfo.title')}
               </h3>
               <p className={styles.instructionCardText}>
-                {t('pages.home.deadlineInfo.description')}
+                {deadlineDate
+                  ? t('pages.home.deadlineInfo.description').replace('{date}', formatDate(deadlineDate))
+                  : t('pages.home.deadlineInfo.description').replace('{date}', 'N/A')}
               </p>
             </div>
 
@@ -195,7 +201,7 @@ const HomePage: React.FC = () => {
                 {t('pages.home.examYear.title')}
               </h3>
               <p className={styles.instructionCardText}>
-                {t('pages.home.examYear.description')}
+                {t('pages.home.examYear.description').replace('{year}', String(currentYear))}
               </p>
             </div>
 
@@ -235,15 +241,15 @@ const HomePage: React.FC = () => {
 
             <div className={styles.instructionCard}>
               <h3 className={styles.instructionCardTitle}>
-                {t('pages.home.viewResults.title')}
+                {t('pages.home.viewResultsInfo.title')}
               </h3>
               <p className={styles.instructionCardText}>
-                {t('pages.home.viewResults.description')}
+                {t('pages.home.viewResultsInfo.description')}
               </p>
               <ul className={styles.instructionList}>
-                <li>{t('pages.home.viewResults.point1')}</li>
-                <li>{t('pages.home.viewResults.point2')}</li>
-                <li>{t('pages.home.viewResults.point3')}</li>
+                <li>{t('pages.home.viewResultsInfo.point1')}</li>
+                <li>{t('pages.home.viewResultsInfo.point2')}</li>
+                <li>{t('pages.home.viewResultsInfo.point3')}</li>
               </ul>
             </div>
 
@@ -265,9 +271,91 @@ const HomePage: React.FC = () => {
               </p>
             </div>
           </div>
+        </div>
 
-          <div className={styles.finalChecklistCard}>
-            <h3 className={styles.finalChecklistTitle}>
+        <div className={styles.instructionsCard}>
+          <h2 className={styles.instructionsCardTitle}>
+            {t('pages.home.instructionsTitle')}
+          </h2>
+          <p className={styles.instructionsCardIntro}>
+            {t('pages.home.instructionsIntro')}
+          </p>
+          
+          <div className={styles.instructionsStepsList}>
+            <div className={styles.instructionStep}>
+              <div className={styles.stepContent}>
+                <span className={styles.stepTitle}>{t('pages.home.instructionsSteps.step1.title')}</span>
+                <span className={styles.stepArrow}>➡</span>
+                <span className={styles.stepDescription}>{t('pages.home.instructionsSteps.step1.description')}</span>
+              </div>
+            </div>
+            
+            <div className={styles.instructionStep}>
+              <div className={styles.stepContent}>
+                <span className={styles.stepTitle}>{t('pages.home.instructionsSteps.step2.title')}</span>
+                <span className={styles.stepArrow}>➡</span>
+                <span className={styles.stepDescription}>{t('pages.home.instructionsSteps.step2.description')}</span>
+              </div>
+            </div>
+            
+            <div className={styles.instructionStep}>
+              <div className={styles.stepContent}>
+                <span className={styles.stepTitle}>{t('pages.home.instructionsSteps.step3.title')}</span>
+                <span className={styles.stepArrow}>➡</span>
+                <span className={styles.stepDescription}>{t('pages.home.instructionsSteps.step3.description')}</span>
+              </div>
+            </div>
+            
+            <div className={styles.instructionStep}>
+              <div className={styles.stepContent}>
+                <span className={styles.stepTitle}>{t('pages.home.instructionsSteps.step4.title')}</span>
+                <span className={styles.stepArrow}>➡</span>
+                <span className={styles.stepDescription}>{t('pages.home.instructionsSteps.step4.description')}</span>
+              </div>
+            </div>
+            
+            <div className={styles.instructionStep}>
+              <div className={styles.stepContent}>
+                <span className={styles.stepTitle}>{t('pages.home.instructionsSteps.step5.title')}</span>
+                <span className={styles.stepArrow}>➡</span>
+                <span className={styles.stepDescription}>{t('pages.home.instructionsSteps.step5.description')}</span>
+              </div>
+            </div>
+            
+            <div className={styles.instructionStep}>
+              <div className={styles.stepContent}>
+                <span className={styles.stepTitle}>{t('pages.home.instructionsSteps.step6.title')}</span>
+                <span className={styles.stepArrow}>➡</span>
+                <span className={styles.stepDescription}>{t('pages.home.instructionsSteps.step6.description')}</span>
+              </div>
+            </div>
+            
+            <div className={styles.instructionStep}>
+              <div className={styles.stepContent}>
+                <span className={styles.stepTitle}>{t('pages.home.instructionsSteps.step7.title')}</span>
+                <span className={styles.stepArrow}>➡</span>
+                <span className={styles.stepDescription}>{t('pages.home.instructionsSteps.step7.description')}</span>
+              </div>
+            </div>
+            
+            <div className={styles.instructionStep}>
+              <div className={styles.stepContent}>
+                <span className={styles.stepTitle}>{t('pages.home.instructionsSteps.step8.title')}</span>
+                <span className={styles.stepArrow}>➡</span>
+                <span className={styles.stepDescription}>{t('pages.home.instructionsSteps.step8.description')}</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className={styles.combinedNotesSection}>
+            <h3 className={styles.notesTitle}>{t('pages.home.instructionsNotes.title')}</h3>
+            <ul className={styles.notesList}>
+              <li>{t('pages.home.instructionsNotes.note1').replace('{year}', String(currentYear))}</li>
+              <li>{t('pages.home.instructionsNotes.note2')}</li>
+              <li>{t('pages.home.instructionsNotes.note3')}</li>
+            </ul>
+            
+            <h3 className={styles.checklistTitle}>
               {t('pages.home.finalChecklist.title')}
             </h3>
             <ul className={styles.checklistList}>
@@ -276,11 +364,10 @@ const HomePage: React.FC = () => {
               <li>{t('pages.home.finalChecklist.point3')}</li>
             </ul>
           </div>
-        </div>
-
-        <div className={styles.instructionsSection}>
-          <h2 className={styles.instructionsTitle}>{t('pages.home.instructionsTitle')}</h2>
-          <p className={styles.instructionsParagraph}>{t('pages.home.instructionsParagraph')}</p>
+          
+          <p className={styles.instructionsRequest}>
+            {t('pages.home.instructionsRequest')}
+          </p>
         </div>
 
         <div className={styles.actionsSection}>

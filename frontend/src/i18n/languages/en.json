@@ -92,8 +92,49 @@
       "title": "Gaudani Parivar | Jay Khodiyar Ma",
       "welcome": "Welcome",
       "instructions": "Click the button below to upload your result",
-      "instructionsTitle": "Instructions for Uploading Result",
-      "instructionsParagraph": "To upload a result, please follow these steps: First, enter the student's full name (required), then select the medium (Gujarati or English) (required), choose the student's standard (required), select the village family (required), enter total marks and obtained marks (percentage will be calculated automatically), enter contact number (required - 10 digits), and finally upload the result image (required). After filling all the required information, click on the 'Upload Result' button.",
+      "instructionsTitle": "📌 Simple Way to Upload Results",
+      "instructionsIntro": "Please fill in accurate information and upload the result as follows:",
+      "instructionsSteps": {
+        "step1": {
+          "title": "✅ 1) Enter Student's Full Name",
+          "description": "Student's Full Name is mandatory."
+        },
+        "step2": {
+          "title": "✅ 2) Select Medium",
+          "description": "Gujarati or English - It is necessary to select the appropriate medium."
+        },
+        "step3": {
+          "title": "✅ 3) Select Standard",
+          "description": "Select the appropriate option from which standard the student is studying."
+        },
+        "step4": {
+          "title": "✅ 4) Select Village / Family",
+          "description": "Select your village or family name from the list."
+        },
+        "step5": {
+          "title": "✅ 5) Fill Marks Information",
+          "description": "Enter Total Marks and Marks Obtained. 📌 Percentage will be calculated automatically by the system."
+        },
+        "step6": {
+          "title": "✅ 6) Enter Contact Number",
+          "description": "Valid 10-digit mobile number is mandatory."
+        },
+        "step7": {
+          "title": "📸 7) Upload Result Photo",
+          "description": "➡ Minimum 1 clear photo is mandatory | ➡ Maximum 2 photos can be uploaded | ❗ If the photo is blurry, incomplete, or unreadable, the result will be cancelled."
+        },
+        "step8": {
+          "title": "🟢 8) Finally click on 'Submit' button",
+          "description": "Please verify all information before submitting."
+        }
+      },
+      "instructionsNotes": {
+        "title": "⚠️ Special Note:",
+        "note1": "📍 Only results from exams taken in March and April {year} will be accepted. Results from any other time will not be considered valid.",
+        "note2": "📍 Only permanent Surat resident Gaudani family members can fill this form.",
+        "note3": "📍 The form will not be submitted without filling all mandatory fields."
+      },
+      "instructionsRequest": "🙏 Request: Please check and verify all information and photos before submitting.",
       "uploadResult": "Upload Result",
       "viewResults": "View Results",
       "calculated": "Calculated",
@@ -116,11 +157,11 @@
       },
       "deadlineInfo": {
         "title": "Result Upload Deadline",
-        "description": "This page will be visible only until 20 December 2025. No results will be accepted after this date."
+        "description": "This page will be visible only until {date}. No results will be accepted after this date."
       },
       "examYear": {
         "title": "Which Exam Year Result to Upload?",
-        "description": "Only upload results from March 2025 exams. Results from any other year will not be accepted."
+        "description": "Only upload results from March - April {year} final exam (varshik pariksh). Results from any other year will not be accepted."
       },
       "photoUpload": {
         "title": "How Many Photos Can Be Uploaded?",
@@ -137,7 +178,7 @@
         "title": "Form Filling Rules",
         "description": "All information requested in the form is mandatory. If any information is left blank, the form will not be submitted."
       },
-      "viewResults": {
+      "viewResultsInfo": {
         "title": "Where Can I View the Submitted Result?",
         "description": "After submission, you can view:",
         "point1": "Your uploaded photo",
