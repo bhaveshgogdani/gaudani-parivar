@@ -38,12 +38,18 @@ export const createResult = async (req, res, next) => {
       });
     }
 
-    if (!req.file) {
+    // Handle file uploads - first image is required, second is optional
+    if (!req.files || !req.files.resultImage || req.files.resultImage.length === 0) {
       return res.status(400).json({
         status: 'error',
         message: 'Result image is required',
       });
     }
+    
+    const firstImage = req.files.resultImage[0];
+    const secondImage = req.files.resultImage2 && req.files.resultImage2.length > 0 
+      ? req.files.resultImage2[0] 
+      : null;
 
     // Validate standard: either standardId or otherStandardName must be provided
     // Note: standardId can be "other" or undefined when using otherStandardName
@@ -109,9 +115,12 @@ export const createResult = async (req, res, next) => {
       calculatedPercentage = Math.round(parseFloat(percentage) * 100) / 100;
     }
 
-    // Handle file upload (required)
-    const resultImageUrl = `/uploads/results/${req.file.filename}`;
-    const resultImageFileName = req.file.originalname;
+    // Handle file uploads - first image (required), second image (optional)
+    const resultImageUrl = `/uploads/results/${firstImage.filename}`;
+    const resultImageFileName = firstImage.originalname;
+    
+    const resultImage2Url = secondImage ? `/uploads/results/${secondImage.filename}` : undefined;
+    const resultImage2FileName = secondImage ? secondImage.originalname : undefined;
 
     const result = new Result({
       studentName,
@@ -125,6 +134,8 @@ export const createResult = async (req, res, next) => {
       contactNumber,
       resultImageUrl,
       resultImageFileName,
+      resultImage2Url,
+      resultImage2FileName,
       submittedAt: new Date(),
     });
 
@@ -271,10 +282,23 @@ export const updateResult = async (req, res, next) => {
       updateData.percentage = Math.round(parseFloat(updateData.percentage) * 100) / 100;
     }
 
-    // Handle file upload
-    if (req.file) {
-      updateData.resultImageUrl = `/uploads/results/${req.file.filename}`;
-      updateData.resultImageFileName = req.file.originalname;
+    // Handle file uploads - first image (optional on update), second image (optional)
+    if (req.files) {
+      if (req.files.resultImage && req.files.resultImage.length > 0) {
+        const firstImage = req.files.resultImage[0];
+        updateData.resultImageUrl = `/uploads/results/${firstImage.filename}`;
+        updateData.resultImageFileName = firstImage.originalname;
+      }
+      
+      if (req.files.resultImage2 && req.files.resultImage2.length > 0) {
+        const secondImage = req.files.resultImage2[0];
+        updateData.resultImage2Url = `/uploads/results/${secondImage.filename}`;
+        updateData.resultImage2FileName = secondImage.originalname;
+      } else if (req.body.removeResultImage2 === 'true') {
+        // Allow removing second image by setting it to null
+        updateData.resultImage2Url = null;
+        updateData.resultImage2FileName = null;
+      }
     }
 
     const result = await Result.findByIdAndUpdate(id, updateData, {

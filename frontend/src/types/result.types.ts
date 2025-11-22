@@ -11,6 +11,8 @@ export interface Result {
   contactNumber?: string;
   resultImageUrl?: string;
   resultImageFileName?: string;
+  resultImage2Url?: string;
+  resultImage2FileName?: string;
   submittedAt: string;
   isVerified: boolean;
   isApproved: boolean;
@@ -48,6 +50,7 @@ export interface CreateResultData {
   villageId: string;
   contactNumber?: string;
   resultImage?: File;
+  resultImage2?: File;
   isApproved?: boolean;
 }
 

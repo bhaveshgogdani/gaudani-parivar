@@ -49,6 +49,7 @@ export const resultApi = {
     formData.append('villageId', data.villageId);
     if (data.contactNumber) formData.append('contactNumber', data.contactNumber);
     if (data.resultImage) formData.append('resultImage', data.resultImage);
+    if (data.resultImage2) formData.append('resultImage2', data.resultImage2);
 
     const response = await api.post<{ status: string; data: Result }>('/results', formData, {
       headers: {

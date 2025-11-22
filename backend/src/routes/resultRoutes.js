@@ -12,12 +12,18 @@ import { upload } from '../config/multer.js';
 const router = express.Router();
 
 // Public routes
-router.post('/', upload.single('resultImage'), createResult);
+router.post('/', upload.fields([
+  { name: 'resultImage', maxCount: 1 },
+  { name: 'resultImage2', maxCount: 1 }
+]), createResult);
 router.get('/', getResults);
 router.get('/:id', getResultById);
 
 // Admin only routes
-router.put('/:id', authMiddleware, upload.single('resultImage'), updateResult);
+router.put('/:id', authMiddleware, upload.fields([
+  { name: 'resultImage', maxCount: 1 },
+  { name: 'resultImage2', maxCount: 1 }
+]), updateResult);
 router.delete('/:id', authMiddleware, deleteResult);
 
 export default router;

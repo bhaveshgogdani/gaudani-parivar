@@ -125,6 +125,7 @@ const HomePage: React.FC = () => {
             || કુળદેવી આઈ શ્રી ખોડીયાર માતાજી ||
           </div>
           <p className={styles.welcome}>{t('pages.home.welcome')}</p>
+          <p className={styles.readInstructionsNotice}>{t('pages.home.readInstructionsNotice')}</p>
         </div>
 
         {hasDeadline && deadlineDate && (

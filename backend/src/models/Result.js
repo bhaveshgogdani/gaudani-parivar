@@ -60,6 +60,14 @@ const ResultSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    resultImage2Url: {
+      type: String,
+      required: false,
+    },
+    resultImage2FileName: {
+      type: String,
+      required: false,
+    },
     submittedAt: {
       type: Date,
       default: Date.now,

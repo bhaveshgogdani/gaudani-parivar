@@ -1,0 +1,281 @@
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 0;
+}
+
+.modalContent {
+  background: white;
+  border-radius: 8px;
+  width: 100%;
+  height: 100vh;
+  max-width: 1400px;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.modalHeader h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #333;
+}
+
+.modalHeaderRight {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.navigationButtons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navButton {
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0.5rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #333;
+  transition: all 0.2s;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.navButton:hover:not(:disabled) {
+  background: #e0e0e0;
+  border-color: #bdbdbd;
+}
+
+.navButton:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.navInfo {
+  font-size: 0.875rem;
+  color: #666;
+  font-weight: 500;
+  min-width: 50px;
+  text-align: center;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: #666;
+  line-height: 1;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.closeButton:hover {
+  background: #f0f0f0;
+}
+
+.modalBody {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.modalLeft {
+  flex: 1;
+  padding: 1rem 1.5rem;
+  overflow-y: auto;
+  border-right: 1px solid #e0e0e0;
+  min-height: 0;
+}
+
+.modalRight {
+  flex: 1;
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.fullImage {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  cursor: pointer;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.fullImage:hover {
+  transform: scale(1.02);
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.form :global(.inputWrapper) {
+  gap: 0.35rem;
+}
+
+.form :global(.inputWrapper .label) {
+  font-size: 0.8rem;
+}
+
+.form :global(.input),
+.form :global(.select) {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+}
+
+.form :global(.errorMessage) {
+  font-size: 0.75rem;
+  margin-top: 0.15rem;
+}
+
+.form :global(.fileUploadWrapper) {
+  gap: 0.35rem;
+}
+
+.form :global(.fileUploadWrapper .label) {
+  font-size: 0.8rem;
+}
+
+.form :global(.uploadArea) {
+  padding: 0.5rem 0.75rem;
+  min-height: auto;
+}
+
+.radioGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.radioGroup label {
+  font-size: 0.85rem;
+}
+
+.radioOptions {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.25rem;
+}
+
+.radioOptions label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.checkboxLabel input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.marksSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.calculatedNote {
+  font-size: 0.85rem;
+  color: #4caf50;
+  font-weight: 500;
+  margin-top: -0.75rem;
+  margin-bottom: -0.25rem;
+}
+
+.modalActions {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.error {
+  color: red;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.required {
+  color: red;
+}
+
+@media (max-width: 768px) {
+  .modalContent {
+    width: 95vw;
+    max-height: 95vh;
+  }
+
+  .modalBody {
+    flex-direction: column;
+  }
+
+  .modalRight {
+    max-height: 300px;
+    border-top: 1px solid #e0e0e0;
+    border-right: none;
+  }
+
+  .marksSection {
+    grid-template-columns: 1fr;
+  }
+}
+

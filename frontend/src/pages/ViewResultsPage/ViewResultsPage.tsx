@@ -33,6 +33,7 @@ const ViewResultsPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasSearched, setHasSearched] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const [selectedImage2, setSelectedImage2] = useState<string | null>(null);
   const isAdmin = localStorage.getItem('adminToken');
 
   const handleSearchByMobile = async (number?: string) => {
@@ -191,6 +192,7 @@ const ViewResultsPage: React.FC = () => {
 
   // Use the shared getImageUrl utility function
   const getResultImageUrl = (result: Result) => getImageUrl(result.resultImageUrl);
+  const getResultImage2Url = (result: Result) => result.resultImage2Url ? getImageUrl(result.resultImage2Url) : null;
 
   // Public view - mobile number search
   if (!isAdmin) {
@@ -267,15 +269,20 @@ const ViewResultsPage: React.FC = () => {
                                 : ''}
                             </td>
                             <td>
-                              {result.resultImageUrl && (
-                                <Button
-                                  variant="success"
-                                  size="small"
-                                  onClick={() => setSelectedImage(getResultImageUrl(result))}
-                                >
-                                  {t('common.view')}
-                                </Button>
-                              )}
+                              <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          {(result.resultImageUrl || result.resultImage2Url) && (
+                            <Button
+                              variant="success"
+                              size="small"
+                              onClick={() => {
+                                setSelectedImage(result.resultImageUrl ? getResultImageUrl(result) : null);
+                                setSelectedImage2(result.resultImage2Url ? getResultImage2Url(result)! : null);
+                              }}
+                            >
+                              {t('common.view')}
+                            </Button>
+                          )}
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -290,8 +297,13 @@ const ViewResultsPage: React.FC = () => {
           {selectedImage && (
             <ImageModal
               imageUrl={selectedImage}
-              onClose={() => setSelectedImage(null)}
-              alt="Result Image"
+              imageUrl2={selectedImage2 || undefined}
+              onClose={() => {
+                setSelectedImage(null);
+                setSelectedImage2(null);
+              }}
+              alt="Result Image 1"
+              alt2="Result Image 2"
             />
           )}
         </div>
@@ -402,25 +414,27 @@ const ViewResultsPage: React.FC = () => {
                     <td>{result.contactNumber || '-'}</td>
                     {isAdmin && (
                       <td>
-                        {result.resultImageUrl && (
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                          {(result.resultImageUrl || result.resultImage2Url) && (
+                            <Button
+                              variant="success"
+                              size="small"
+                              onClick={() => {
+                                setSelectedImage(result.resultImageUrl ? getResultImageUrl(result) : null);
+                                setSelectedImage2(result.resultImage2Url ? getResultImage2Url(result)! : null);
+                              }}
+                            >
+                              {t('common.view')}
+                            </Button>
+                          )}
                           <Button
-                            variant="success"
+                            variant="danger"
                             size="small"
-                            onClick={() => {
-                              setSelectedImage(getResultImageUrl(result));
-                            }}
-                            style={{ marginRight: '0.5rem' }}
+                            onClick={() => handleDelete(result._id)}
                           >
-                            {t('common.view')}
+                            {t('common.delete')}
                           </Button>
-                        )}
-                        <Button
-                          variant="danger"
-                          size="small"
-                          onClick={() => handleDelete(result._id)}
-                        >
-                          {t('common.delete')}
-                        </Button>
+                        </div>
                       </td>
                     )}
                   </tr>

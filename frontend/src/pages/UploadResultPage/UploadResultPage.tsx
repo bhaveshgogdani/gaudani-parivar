@@ -99,6 +99,7 @@ const UploadResultPage: React.FC = () => {
   const [isUploadClosed, setIsUploadClosed] = useState(false);
   const [deadlineDate, setDeadlineDate] = useState<Date | null>(null);
   const [resultImage, setResultImage] = useState<File | null>(null);
+  const [resultImage2, setResultImage2] = useState<File | null>(null);
   const [calculatedPercentage, setCalculatedPercentage] = useState<number | null>(null);
 
   const {
@@ -193,6 +194,8 @@ const UploadResultPage: React.FC = () => {
       return;
     }
     
+    // Note: resultImage2 is optional, so we don't check for it
+    
     // Check if upload deadline has passed
     try {
       const settings = await adminApi.getSettingsPublic();
@@ -216,6 +219,7 @@ const UploadResultPage: React.FC = () => {
       const resultData: CreateResultData = {
         ...data,
         resultImage: resultImage,
+        resultImage2: resultImage2 || undefined, // Optional second image
       };
       
       // If "other" is selected, clear standardId and use otherStandardName
@@ -240,6 +244,7 @@ const UploadResultPage: React.FC = () => {
   const handleReset = () => {
     reset();
     setResultImage(null);
+    setResultImage2(null);
     setCalculatedPercentage(null);
     setValue('otherStandardName', '');
   };
@@ -407,6 +412,12 @@ const UploadResultPage: React.FC = () => {
             onChange={setResultImage}
             value={resultImage}
             error={!resultImage ? t('validation.resultImageRequired') : undefined}
+          />
+
+          <FileUpload
+            label={t('forms.resultImage2')}
+            onChange={setResultImage2}
+            value={resultImage2}
           />
 
           <div className={styles.actions}>

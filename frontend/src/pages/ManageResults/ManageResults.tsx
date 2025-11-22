@@ -7,84 +7,14 @@ import { standardApi } from '../../services/api/standardApi';
 import { Result, Village, Standard, CreateResultData } from '../../types/result.types';
 import { getImageUrl } from '../../utils/apiConfig';
 import Layout from '../../components/layout/Layout';
-import Select from '../../components/common/Select/Select';
-import Input from '../../components/common/Input/Input';
 import Button from '../../components/common/Button/Button';
-import FileUpload from '../../components/common/FileUpload/FileUpload';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import Select from '../../components/common/Select/Select';
+import ImageModal from '../../components/common/ImageModal/ImageModal';
+import EditResultModal from '../../components/common/EditResultModal/EditResultModal';
 import styles from './ManageResults.module.css';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { saveAs } from 'file-saver';
 import { reportApi } from '../../services/api/reportApi';
-
-const resultSchema = z.object({
-  studentName: z.string().min(1, 'Student name is required').min(2, 'Minimum 2 characters required').max(100),
-  standardId: z.string().optional(),
-  otherStandardName: z.string().optional(),
-  medium: z.enum(['gujarati', 'english'], {
-    errorMap: () => ({ message: 'Medium is required' }),
-  }),
-  totalMarks: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
-    z.number({ required_error: 'Total marks is required', invalid_type_error: 'Total marks must be a number' })
-      .min(1, 'Total marks must be at least 1')
-      .max(10000)
-  ),
-  obtainedMarks: z.preprocess(
-    (val) => (val === '' || val === null || val === undefined ? undefined : Number(val)),
-    z.number({ required_error: 'Obtained marks is required', invalid_type_error: 'Obtained marks must be a number' })
-      .min(0, 'Obtained marks cannot be negative')
-  ),
-  percentage: z.number().min(0).max(100),
-  villageId: z.string().refine((val) => val && val.length > 0 && val !== '', {
-    message: 'Village is required',
-  }),
-  contactNumber: z.string().min(1, 'Contact number is required').regex(/^[0-9]{10}$/, 'Contact number must be exactly 10 digits'),
-  isApproved: z.boolean().default(false),
-}).refine(
-  (data) => {
-    return data.obtainedMarks <= data.totalMarks;
-  },
-  {
-    message: 'Obtained marks cannot exceed total marks',
-    path: ['obtainedMarks'],
-  }
-).refine(
-  (data) => {
-    const hasStandard = data.standardId && data.standardId !== '' && data.standardId !== 'other';
-    const hasOtherStandard = data.otherStandardName && data.otherStandardName.trim().length >= 2;
-    return hasStandard || hasOtherStandard;
-  },
-  {
-    message: 'Either standard or other standard name is required',
-    path: ['standardId'],
-  }
-).refine(
-  (data) => {
-    const hasStandard = data.standardId && data.standardId !== '' && data.standardId !== 'other';
-    const hasOtherStandard = data.otherStandardName && data.otherStandardName.trim().length >= 2;
-    return !(hasStandard && hasOtherStandard);
-  },
-  {
-    message: 'Cannot provide both standard and other standard name',
-    path: ['standardId'],
-  }
-).refine(
-  (data) => {
-    if (data.otherStandardName) {
-      return data.otherStandardName.trim().length >= 2 && data.otherStandardName.trim().length <= 100;
-    }
-    return true;
-  },
-  {
-    message: 'Other standard name must be between 2 and 100 characters',
-    path: ['otherStandardName'],
-  }
-);
-
-type ResultFormData = z.infer<typeof resultSchema>;
 
 const ManageResults: React.FC = () => {
   const { t } = useTranslation();
@@ -100,32 +30,12 @@ const ManageResults: React.FC = () => {
   });
   const [selectedResult, setSelectedResult] = useState<Result | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [resultImage, setResultImage] = useState<File | null>(null);
   const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
-  const [calculatedPercentage, setCalculatedPercentage] = useState<number | null>(null);
+  const [fullImageUrl2, setFullImageUrl2] = useState<string | null>(null);
   const [autoOpenedResultId, setAutoOpenedResultId] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc' | null>(null);
   const location = useLocation();
   const navigate = useNavigate();
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-    watch,
-    setValue,
-    reset,
-  } = useForm<ResultFormData>({
-    resolver: zodResolver(resultSchema),
-    mode: 'onSubmit',
-    reValidateMode: 'onChange',
-    shouldFocusError: true,
-  });
-
-  const totalMarks = watch('totalMarks');
-  const obtainedMarks = watch('obtainedMarks');
-  const selectedStandardId = watch('standardId');
-  const isOtherStandard = selectedStandardId === 'other';
 
   useEffect(() => {
     loadData();
@@ -135,17 +45,6 @@ const ManageResults: React.FC = () => {
     loadResults();
   }, [activeTab, filters]);
 
-  useEffect(() => {
-    if (totalMarks && obtainedMarks !== undefined && totalMarks > 0 && !isNaN(totalMarks) && !isNaN(obtainedMarks)) {
-      const calc = (obtainedMarks / totalMarks) * 100;
-      const calculatedValue = parseFloat(calc.toFixed(2));
-      setCalculatedPercentage(calculatedValue);
-      setValue('percentage', calculatedValue, { shouldValidate: false });
-    } else {
-      setCalculatedPercentage(null);
-      setValue('percentage', 0, { shouldValidate: false });
-    }
-  }, [totalMarks, obtainedMarks, setValue]);
 
   const loadData = async () => {
     try {
@@ -210,62 +109,57 @@ const ManageResults: React.FC = () => {
   const handleEdit = (result: Result) => {
     setSelectedResult(result);
     setIsModalOpen(true);
-    setResultImage(null);
     setFullImageUrl(null);
-    
-    const villageId = typeof result.villageId === 'object' ? result.villageId._id : result.villageId;
-    
-    // Handle standard: if otherStandardName exists, use "other", otherwise use standardId
-    let standardId: string;
-    let otherStandardName: string | undefined;
-    if (result.otherStandardName) {
-      standardId = 'other';
-      otherStandardName = result.otherStandardName;
-    } else {
-      standardId = typeof result.standardId === 'object' ? result.standardId._id : (result.standardId || '');
-      otherStandardName = undefined;
-    }
-    
-    reset({
-      studentName: result.studentName,
-      standardId: standardId,
-      otherStandardName: otherStandardName,
-      medium: result.medium,
-      totalMarks: result.totalMarks,
-      obtainedMarks: result.obtainedMarks,
-      percentage: result.percentage,
-      villageId: villageId,
-      contactNumber: result.contactNumber || '',
-      isApproved: result.isApproved || false,
-    });
   };
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const resultId = params.get('resultId');
 
-    if (resultId && autoOpenedResultId !== resultId && results.length > 0) {
-      const targetResult = results.find((result) => result._id === resultId);
-      if (targetResult) {
-        handleEdit(targetResult);
-        setAutoOpenedResultId(resultId);
+    if (resultId && autoOpenedResultId !== resultId) {
+      // Fetch the result directly by ID to ensure we have it regardless of current filters
+      const fetchAndOpenResult = async () => {
+        try {
+          const targetResult = await resultApi.getById(resultId);
+          
+          // Determine which tab the result should be in
+          const standard = typeof targetResult.standardId === 'object' ? targetResult.standardId : null;
+          const shouldBeInCollegeTab = standard?.isCollegeLevel === true;
+          const correctTab = shouldBeInCollegeTab ? 'college' : (targetResult.medium as 'gujarati' | 'english');
+          
+          // Set the active tab to match the result's category if needed
+          if (activeTab !== correctTab) {
+            setActiveTab(correctTab);
+          }
+          
+          // Open the edit modal immediately with the fetched result
+          // We don't need to wait for it to appear in filtered results
+          handleEdit(targetResult);
+          setAutoOpenedResultId(resultId);
 
-        params.delete('resultId');
-        const newSearch = params.toString();
-        navigate(
-          newSearch ? `${location.pathname}?${newSearch}` : location.pathname,
-          { replace: true }
-        );
-      }
+          // Clean up the URL
+          params.delete('resultId');
+          const newSearch = params.toString();
+          navigate(
+            newSearch ? `${location.pathname}?${newSearch}` : location.pathname,
+            { replace: true }
+          );
+        } catch (error) {
+          console.error('Error fetching result:', error);
+          showError('Failed to load result');
+        }
+      };
+
+      fetchAndOpenResult();
     }
-  }, [location.search, results, autoOpenedResultId, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.search, autoOpenedResultId]);
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedResult(null);
-    setResultImage(null);
     setFullImageUrl(null);
-    reset();
+    setFullImageUrl2(null);
   };
 
   const handleDelete = async (id: string) => {
@@ -280,115 +174,6 @@ const ManageResults: React.FC = () => {
     }
   };
 
-  const onSubmit = async (data: ResultFormData, closeAfterSave: boolean = false) => {
-    if (!selectedResult) return;
-    
-    setIsLoading(true);
-    try {
-      // Prepare the data - handle "other" standard case
-      const resultData: Partial<CreateResultData> = {
-        ...data,
-      };
-      
-      // If "other" is selected, clear standardId and use otherStandardName
-      if (data.standardId === 'other') {
-        resultData.standardId = undefined;
-        resultData.otherStandardName = data.otherStandardName;
-      } else {
-        // If a regular standard is selected, clear otherStandardName
-        resultData.standardId = data.standardId;
-        resultData.otherStandardName = undefined;
-      }
-      if (resultImage) {
-        resultData.resultImage = resultImage;
-      }
-      
-      await resultApi.update(selectedResult._id, resultData);
-      showSuccess(t('messages.success.resultUpdated'));
-      
-      // Reload results to get updated data
-      let filtersToApply: any = {
-        limit: 10000,
-      };
-      
-      // For college tab, don't filter by medium
-      if (activeTab !== 'college') {
-        filtersToApply.medium = activeTab;
-      }
-      
-      if (filters.standardId) filtersToApply.standardId = filters.standardId;
-      if (filters.villageId) filtersToApply.villageId = filters.villageId;
-      
-      const response = await resultApi.getAll(filtersToApply);
-      let updatedResults = response.data;
-      
-      // Filter by college level based on active tab
-      if (activeTab === 'college') {
-        // Only show college level results
-        updatedResults = updatedResults.filter((result: Result) => {
-          const standard = typeof result.standardId === 'object' ? result.standardId : null;
-          return standard?.isCollegeLevel === true;
-        });
-      } else {
-        // For gujarati and english tabs, exclude college level results
-        updatedResults = updatedResults.filter((result: Result) => {
-          const standard = typeof result.standardId === 'object' ? result.standardId : null;
-          return standard?.isCollegeLevel !== true;
-        });
-      }
-      
-      setResults(updatedResults);
-      
-      // If save and close, close the modal
-      if (closeAfterSave) {
-      handleCloseModal();
-      } else {
-        // If just save, find the updated result and keep modal open
-        const updatedResult = updatedResults.find(r => r._id === selectedResult._id);
-        if (updatedResult) {
-          setSelectedResult(updatedResult);
-          // Reset form with updated data
-          const villageId = typeof updatedResult.villageId === 'object' ? updatedResult.villageId._id : updatedResult.villageId;
-          
-          // Handle standard: if otherStandardName exists, use "other", otherwise use standardId
-          let standardId: string;
-          let otherStandardName: string | undefined;
-          if (updatedResult.otherStandardName) {
-            standardId = 'other';
-            otherStandardName = updatedResult.otherStandardName;
-          } else {
-            standardId = typeof updatedResult.standardId === 'object' ? updatedResult.standardId._id : (updatedResult.standardId || '');
-            otherStandardName = undefined;
-          }
-          reset({
-            studentName: updatedResult.studentName,
-            standardId: standardId,
-            otherStandardName: otherStandardName,
-            medium: updatedResult.medium,
-            totalMarks: updatedResult.totalMarks,
-            obtainedMarks: updatedResult.obtainedMarks,
-            percentage: updatedResult.percentage,
-            villageId: villageId,
-            contactNumber: updatedResult.contactNumber || '',
-            isApproved: updatedResult.isApproved || false,
-          });
-          setResultImage(null); // Clear image selection after save
-        }
-      }
-    } catch (error: any) {
-      showError(error.response?.data?.message || t('messages.error.serverError'));
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleSave = async (data: ResultFormData) => {
-    await onSubmit(data, false);
-  };
-
-  const handleSaveAndClose = async (data: ResultFormData) => {
-    await onSubmit(data, true);
-  };
 
   const getCurrentResultIndex = () => {
     if (!selectedResult) return -1;
@@ -421,8 +206,9 @@ const ManageResults: React.FC = () => {
     return currentIndex > 0;
   };
 
-  const handleImageClick = (imageUrl: string) => {
-    setFullImageUrl(imageUrl);
+  const handleImageClick = (result: Result) => {
+    setFullImageUrl(result.resultImageUrl ? getResultImageUrl(result) : null);
+    setFullImageUrl2(result.resultImage2Url ? getResultImage2Url(result)! : null);
   };
 
   const getStandardName = (result: Result) => {
@@ -444,6 +230,7 @@ const ManageResults: React.FC = () => {
 
   // Use the shared getImageUrl utility function
   const getResultImageUrl = (result: Result) => getImageUrl(result.resultImageUrl);
+  const getResultImage2Url = (result: Result) => result.resultImage2Url ? getImageUrl(result.resultImage2Url) : null;
 
   const handleSortByPercentage = () => {
     if (sortOrder === null || sortOrder === 'desc') {
@@ -643,14 +430,26 @@ const ManageResults: React.FC = () => {
                         </span>
                       </td>
                       <td>
-                        {result.resultImageUrl && (
-                          <img
-                            src={getResultImageUrl(result)}
-                            alt="Result"
-                            className={styles.resultThumbnail}
-                            onClick={() => handleImageClick(getResultImageUrl(result))}
-                          />
-                        )}
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                          {result.resultImageUrl && (
+                            <img
+                              src={getResultImageUrl(result)}
+                              alt="Result 1"
+                              className={styles.resultThumbnail}
+                              onClick={() => handleImageClick(result)}
+                              title="Result Image 1"
+                            />
+                          )}
+                          {result.resultImage2Url && (
+                            <img
+                              src={getResultImage2Url(result)!}
+                              alt="Result 2"
+                              className={styles.resultThumbnail}
+                              onClick={() => handleImageClick(result)}
+                              title="Result Image 2"
+                            />
+                          )}
+                        </div>
                       </td>
                       <td>
                         <div className={styles.actions}>
@@ -679,218 +478,34 @@ const ManageResults: React.FC = () => {
         )}
 
         {isModalOpen && selectedResult && (
-          <div className={styles.modalOverlay} onClick={handleCloseModal}>
-            <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-              <div className={styles.modalHeader}>
-                <h2>{t('common.edit')}</h2>
-                <div className={styles.modalHeaderRight}>
-                  {sortedResults.length > 1 && (
-                    <div className={styles.navigationButtons}>
-                      <button
-                        className={styles.navButton}
-                        onClick={handlePrevious}
-                        disabled={!canNavigatePrevious()}
-                      >
-                        {t('common.previous')}
-                      </button>
-                      <span className={styles.navInfo}>
-                        {getCurrentResultIndex() + 1} / {sortedResults.length}
-                      </span>
-                      <button
-                        className={styles.navButton}
-                        onClick={handleNext}
-                        disabled={!canNavigateNext()}
-                      >
-                        {t('common.next')}
-                      </button>
-                    </div>
-                  )}
-                <button className={styles.closeButton} onClick={handleCloseModal}>
-                  ×
-                </button>
-                </div>
-              </div>
-              <div className={styles.modalBody}>
-                <div className={styles.modalLeft}>
-                  <form onSubmit={(e) => e.preventDefault()} className={styles.form}>
-                      <Input
-                        label={<>{t('forms.studentName')} <span className={styles.required}>*</span></>}
-                        {...register('studentName')}
-                        error={errors.studentName?.message}
-                      />
-
-                      <div className={styles.radioGroup}>
-                        <label>{t('forms.medium')} <span className={styles.required}>*</span></label>
-                        <div className={styles.radioOptions}>
-                          <label>
-                            <input
-                              type="radio"
-                              value="gujarati"
-                              {...register('medium')}
-                            />
-                            {t('forms.gujarati')}
-                          </label>
-                          <label>
-                            <input
-                              type="radio"
-                              value="english"
-                              {...register('medium')}
-                            />
-                            {t('forms.english')}
-                          </label>
-                        </div>
-                        {errors.medium && <span className={styles.error}>{errors.medium.message}</span>}
-                      </div>
-
-                      <Select
-                        label={<>{t('forms.standard')} <span className={styles.required}>*</span></>}
-                        options={[
-                          ...standards.map((s) => ({
-                            value: s._id,
-                            label: s.standardName,
-                          })),
-                          {
-                            value: 'other',
-                            label: t('forms.otherStandard'),
-                          },
-                        ]}
-                        {...register('standardId', {
-                          onChange: (e) => {
-                            const value = e.target.value;
-                            if (value !== 'other') {
-                              setValue('otherStandardName', '');
-                            }
-                          },
-                        })}
-                        error={errors.standardId?.message}
-                      />
-
-                      {isOtherStandard && (
-                        <Input
-                          label={<>{t('forms.otherStandardName')} <span className={styles.required}>*</span></>}
-                          {...register('otherStandardName')}
-                          error={errors.otherStandardName?.message}
-                          placeholder={t('forms.otherStandardPlaceholder')}
-                        />
-                      )}
-
-                      <div className={styles.marksSection}>
-                        <Input
-                          label={<>{t('forms.totalMarks')} <span className={styles.required}>*</span></>}
-                          type="number"
-                          step="1"
-                          {...register('totalMarks', { 
-                            valueAsNumber: true,
-                            required: 'Total marks is required',
-                          })}
-                          error={errors.totalMarks?.message}
-                        />
-                        <Input
-                          label={<>{t('forms.obtainedMarks')} <span className={styles.required}>*</span></>}
-                          type="number"
-                          step="0.01"
-                          {...register('obtainedMarks', { 
-                            valueAsNumber: true,
-                            required: 'Obtained marks is required',
-                          })}
-                          error={errors.obtainedMarks?.message}
-                        />
-                      </div>
-
-                      <Input
-                        label={t('forms.percentage')}
-                        type="number"
-                        step="0.01"
-                        {...register('percentage', { valueAsNumber: true })}
-                        error={errors.percentage?.message}
-                      />
-                      {calculatedPercentage !== null && totalMarks && obtainedMarks && (
-                        <p className={styles.calculatedNote}>
-                          {t('pages.home.calculated')}: {calculatedPercentage.toFixed(2)}% (suggestion - you can edit the percentage above)
-                        </p>
-                      )}
-
-                      <Select
-                        label={<>{t('forms.village')} <span className={styles.required}>*</span></>}
-                        options={villages.map((v) => ({
-                          value: v._id,
-                          label: v.villageName,
-                        }))}
-                        {...register('villageId')}
-                        error={errors.villageId?.message}
-                      />
-
-                      <Input
-                        label={<>{t('forms.contactNumber')} <span className={styles.required}>*</span></>}
-                        type="tel"
-                        maxLength={10}
-                        {...register('contactNumber')}
-                        error={errors.contactNumber?.message}
-                      />
-
-                      <div className={styles.checkboxGroup}>
-                        <label className={styles.checkboxLabel}>
-                          <input
-                            type="checkbox"
-                            {...register('isApproved')}
-                          />
-                          <span>Approved</span>
-                        </label>
-                      </div>
-
-                      <FileUpload
-                        label={t('forms.resultImage')}
-                        onChange={setResultImage}
-                        value={resultImage}
-                      />
-
-                      <div className={styles.modalActions}>
-                        <Button 
-                          type="button" 
-                          variant="primary" 
-                          onClick={handleSubmit(handleSave)}
-                          isLoading={isLoading}
-                        >
-                          {t('common.save')}
-                        </Button>
-                        <Button 
-                          type="button" 
-                          variant="success" 
-                          onClick={handleSubmit(handleSaveAndClose)}
-                          isLoading={isLoading}
-                        >
-                          {t('common.saveAndClose')}
-                        </Button>
-                        <Button type="button" variant="danger" onClick={handleCloseModal}>
-                          {t('common.cancel')}
-                        </Button>
-                      </div>
-                    </form>
-                </div>
-                <div className={styles.modalRight}>
-                  {selectedResult.resultImageUrl && (
-                    <img
-                      src={getResultImageUrl(selectedResult)}
-                      alt="Result"
-                      className={styles.fullImage}
-                      onClick={() => handleImageClick(getResultImageUrl(selectedResult))}
-                    />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          <EditResultModal
+            result={selectedResult}
+            isOpen={isModalOpen}
+            onClose={handleCloseModal}
+            onSave={() => {
+              loadResults();
+            }}
+            showNavigation={sortedResults.length > 1}
+            currentIndex={getCurrentResultIndex()}
+            totalCount={sortedResults.length}
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+            canNavigatePrevious={canNavigatePrevious}
+            canNavigateNext={canNavigateNext}
+          />
         )}
 
         {fullImageUrl && (
-          <div className={styles.imageModalOverlay} onClick={() => setFullImageUrl(null)}>
-            <div className={styles.imageModalContent} onClick={(e) => e.stopPropagation()}>
-              <button className={styles.closeImageButton} onClick={() => setFullImageUrl(null)}>
-                ×
-              </button>
-              <img src={fullImageUrl} alt="Full Result" className={styles.fullSizeImage} />
-            </div>
-          </div>
+          <ImageModal
+            imageUrl={fullImageUrl}
+            imageUrl2={fullImageUrl2 || undefined}
+            onClose={() => {
+              setFullImageUrl(null);
+              setFullImageUrl2(null);
+            }}
+            alt="Result Image 1"
+            alt2="Result Image 2"
+          />
         )}
       </div>
     </Layout>

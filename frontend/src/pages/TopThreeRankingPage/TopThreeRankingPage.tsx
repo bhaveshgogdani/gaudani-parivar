@@ -8,9 +8,10 @@ import { Standard } from '../../types/result.types';
 import { getImageUrl } from '../../utils/apiConfig';
 import Layout from '../../components/layout/Layout';
 import Button from '../../components/common/Button/Button';
+import ImageModal from '../../components/common/ImageModal/ImageModal';
+import EditResultModal from '../../components/common/EditResultModal/EditResultModal';
 import { saveAs } from 'file-saver';
 import styles from './TopThreeRankingPage.module.css';
-import { useNavigate } from 'react-router-dom';
 
 const TopThreeRankingPage: React.FC = () => {
   const { t } = useTranslation();
@@ -21,8 +22,9 @@ const TopThreeRankingPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'gujarati' | 'english'>('gujarati');
   const [fullImageUrl, setFullImageUrl] = useState<string | null>(null);
+  const [fullImageUrl2, setFullImageUrl2] = useState<string | null>(null);
+  const [editingResultId, setEditingResultId] = useState<string | null>(null);
   const isAdmin = localStorage.getItem('adminToken');
-  const navigate = useNavigate();
 
   useEffect(() => {
     const initialize = async () => {
@@ -149,18 +151,18 @@ const TopThreeRankingPage: React.FC = () => {
 
   const currentResults = activeTab === 'gujarati' ? gujaratiResults : englishResults;
 
-  const handleImageClick = (imageUrl: string) => {
-    if (imageUrl) {
-      setFullImageUrl(imageUrl);
-    }
+  const handleImageClick = (result: any) => {
+    setFullImageUrl(result.resultImageUrl ? getResultImageUrl(result) : null);
+    setFullImageUrl2(result.resultImage2Url ? getResultImage2Url(result)! : null);
   };
 
   const handleEditClick = (id: string) => {
-    navigate(`/admin/manage-results?resultId=${id}`);
+    setEditingResultId(id);
   };
 
   // Use the shared getImageUrl utility function
   const getResultImageUrl = (result: any) => getImageUrl(result.resultImageUrl);
+  const getResultImage2Url = (result: any) => result.resultImage2Url ? getImageUrl(result.resultImage2Url) : null;
 
   return (
     <Layout>
@@ -228,6 +230,7 @@ const TopThreeRankingPage: React.FC = () => {
                               : '-';
 
                           const imageUrl = getResultImageUrl(result);
+                          const image2Url = getResultImage2Url(result);
 
                           return (
                     <tr key={result._id}>
@@ -237,16 +240,27 @@ const TopThreeRankingPage: React.FC = () => {
                               <td>{villageName || '-'}</td>
                       <td>{result.contactNumber || '-'}</td>
                               <td>
-                                {imageUrl ? (
-                                  <img
-                                    src={imageUrl}
-                                    alt="Result"
-                                    className={styles.resultThumbnail}
-                                    onClick={() => handleImageClick(imageUrl)}
-                                  />
-                                ) : (
-                                  '-'
-                                )}
+                                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                                  {imageUrl ? (
+                                    <img
+                                      src={imageUrl}
+                                      alt="Result 1"
+                                      className={styles.resultThumbnail}
+                                      onClick={() => handleImageClick(result)}
+                                      title="Result Image 1"
+                                    />
+                                  ) : null}
+                                  {image2Url ? (
+                                    <img
+                                      src={image2Url}
+                                      alt="Result 2"
+                                      className={styles.resultThumbnail}
+                                      onClick={() => handleImageClick(result)}
+                                      title="Result Image 2"
+                                    />
+                                  ) : null}
+                                  {!imageUrl && !image2Url && '-'}
+                                </div>
                               </td>
                       {isAdmin && (
                         <td>
@@ -281,20 +295,30 @@ const TopThreeRankingPage: React.FC = () => {
         )}
 
         {fullImageUrl && (
-          <div className={styles.imageModalOverlay} onClick={() => setFullImageUrl(null)}>
-            <div
-              className={styles.imageModalContent}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className={styles.closeImageButton}
-                onClick={() => setFullImageUrl(null)}
-              >
-                ×
-              </button>
-              <img src={fullImageUrl} alt="Result" className={styles.fullSizeImage} />
-            </div>
-          </div>
+          <ImageModal
+            imageUrl={fullImageUrl}
+            imageUrl2={fullImageUrl2 || undefined}
+            onClose={() => {
+              setFullImageUrl(null);
+              setFullImageUrl2(null);
+            }}
+            alt="Result Image 1"
+            alt2="Result Image 2"
+          />
+        )}
+
+        {editingResultId && (
+          <EditResultModal
+            resultId={editingResultId}
+            isOpen={!!editingResultId}
+            onClose={() => {
+              setEditingResultId(null);
+              loadTopThree(); // Reload results after edit
+            }}
+            onSave={() => {
+              loadTopThree(); // Reload results after save
+            }}
+          />
         )}
       </div>
     </Layout>

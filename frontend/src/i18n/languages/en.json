@@ -50,6 +50,7 @@
     "village": "Village Family",
     "contactNumber": "Contact Number",
     "resultImage": "Result Image",
+    "resultImage2": "Additional Result Image (Optional)",
     "email": "Email",
     "password": "Password",
     "villageName": "Village/Family Name",
@@ -94,6 +95,7 @@
     "home": {
       "title": "Gaudani Parivar | Jay Khodiyar Ma",
       "welcome": "Welcome",
+      "readInstructionsNotice": "For upload result please read all instruction carefully and scroll down to upload result",
       "instructions": "Click the button below to upload your result",
       "instructionsTitle": "📌 Simple Way to Upload Results",
       "instructionsIntro": "Please fill in accurate information and upload the result as follows:",
